@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (adminCard) {
     adminCard.addEventListener('click', () => {
-      // Redirect to admin login page (create admin.html if needed)
-      window.location.href = 'admin.html';
+      window.location.href = 'login.html';
     });
   }
 
