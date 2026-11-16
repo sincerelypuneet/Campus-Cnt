@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusSpace – Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css" />
+  <!-- Font Awesome for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>CampusSpace</h2>
+      </div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="#" class="nav-link" data-section="teachers"><i class="fas fa-chalkboard-teacher"></i> Teacher Management</a></li>
+        <li><a href="#" class="nav-link" data-section="students"><i class="fas fa-user-graduate"></i> Student Management</a></li>
+        <li><a href="#" class="nav-link" data-section="departments"><i class="fas fa-building"></i> Department Management</a></li>
+        <li><a href="#" class="nav-link" data-section="subjects"><i class="fas fa-book"></i> Subject Management</a></li>
+        <li><a href="#" class="nav-link" data-section="classrooms"><i class="fas fa-door-open"></i> Classroom Management</a></li>
+        <li><a href="#" class="nav-link" data-section="timetable"><i class="fas fa-calendar-alt"></i> Timetable Management</a></li>
+        <li><a href="#" class="nav-link" data-section="labs"><i class="fas fa-flask"></i> Laboratory Management</a></li>
+        <li><a href="#" class="nav-link" data-section="bookings"><i class="fas fa-clipboard-list"></i> Booking Management</a></li>
+        <li><a href="#" class="nav-link" data-section="notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+        <li><a href="#" class="nav-link" data-section="settings"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="#" class="nav-link" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+
+    <main class="content" id="main-content">
+      <header class="topbar">
+        <button class="toggle-btn" id="toggle-sidebar"><i class="fas fa-bars"></i></button>
+        <div class="profile">
+          <span id="user-email">admin@campusspace.local</span>
+          <img src="logo.svg" alt="Profile" class="avatar" />
+        </div>
+      </header>
+
+      <!-- Dashboard Section -->
+      <section class="dashboard" id="dashboard-section">
+        <h1 class="section-title">Dashboard Overview</h1>
+        <div class="stats-grid" id="stats-grid">
+          <!-- Stats cards will be injected here -->
+        </div>
+        <div class="today-timetable" id="today-timetable">
+          <h2>Today's Timetable</h2>
+          <ul class="timetable-list" id="timetable-list">
+            <!-- List items injected -->
+          </ul>
+        </div>
+        <div class="quick-actions">
+          <button class="action-btn" id="add-teacher"><i class="fas fa-plus"></i> Add Teacher</button>
+          <button class="action-btn" id="add-student"><i class="fas fa-plus"></i> Add Student</button>
+          <button class="action-btn" id="create-classroom"><i class="fas fa-plus"></i> Create Classroom</button>
+        </div>
+      </section>
+      <!-- Placeholder sections for other pages -->
+      <section class="placeholder" id="placeholder-section" style="display:none;">
+        <h2>Coming Soon</h2>
+        <p>This section will be developed later.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

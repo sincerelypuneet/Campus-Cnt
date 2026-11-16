@@ -1,0 +1,106 @@
+/* styles.css */
+/* Color palette */
+:root {
+    --primary-white: #ffffff;
+    --primary-light-blue: #e6f2ff;
+    --primary-dark-navy: #1a2b3c;
+    --accent-blue: #4a90e2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+    background-color: var(--primary-light-blue);
+    color: var(--primary-dark-navy);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.container {
+    max-width: 960px;
+    width: 100%;
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--primary-white);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.hero .logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    color: #555;
+}
+
+.role-selection {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background-color: var(--primary-white);
+    flex: 1 1 260px;
+    min-height: 200px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.icon {
+    font-size: 3rem;
+    color: var(--accent-blue);
+    margin-bottom: 0.75rem;
+}
+
+.card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 1.5rem;
+    }
+    .card {
+        flex: 1 1 100%;
+    }
+}

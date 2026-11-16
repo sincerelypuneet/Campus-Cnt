@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusSpace – Teacher Management</title>
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="teachers.css" />
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header"><h2>CampusSpace</h2></div>
+      <ul class="nav-list">
+        <li><a href="admin.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="teachers.html" class="nav-link active"><i class="fas fa-chalkboard-teacher"></i> Teacher Management</a></li>
+        <!-- other links omitted for brevity -->
+        <li><a href="#" class="nav-link" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+
+    <main class="content">
+      <header class="topbar">
+        <button class="toggle-btn" id="toggle-sidebar"><i class="fas fa-bars"></i></button>
+        <div class="profile"><span id="user-email">admin@campusspace.local</span><img src="logo.svg" alt="Profile" class="avatar" /></div>
+      </header>
+
+      <section class="dashboard" style="padding:1.5rem;">
+        <h1 class="section-title">Teacher Management</h1>
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Search teachers by name or email..." />
+          <select id="dept-filter">
+            <option value="">All Departments</option>
+            <!-- options will be populated dynamically -->
+          </select>
+          <button id="search-btn" class="action-btn"><i class="fas fa-search"></i> Search</button>
+        </div>
+        <button id="add-teacher-btn" class="action-btn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Add Teacher</button>
+        <table class="teacher-table" id="teacher-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Designation</th>
+              <th>Subjects</th>
+              <th>Classrooms</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal for add / edit -->
+  <div class="modal" id="teacher-modal">
+    <div class="modal-content">
+      <span class="close" id="modal-close">&times;</span>
+      <h2 id="modal-title">Add Teacher</h2>
+      <form id="teacher-form">
+        <label>Full Name<input type="text" name="fullName" required /></label>
+        <label>Email<input type="email" name="email" required /></label>
+        <label>Contact Number<input type="text" name="contactNumber" /></label>
+        <label>Department<select name="departmentId" id="dept-select" required></select></label>
+        <label>Designation<input type="text" name="designation" required /></label>
+        <label>Subjects Taught (comma‑separated IDs)<input type="text" name="subjectsTaught" /></label>
+        <label>Assigned Classrooms (comma‑separated IDs)<input type="text" name="assignedClassrooms" /></label>
+        <label>Profile Image URL (optional)<input type="url" name="profileImage" /></label>
+        <label>Initial Password<input type="password" name="password" required /></label>
+        <button type="submit" class="action-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+  <script src="teachers.js"></script>
+</body>
+</html>
