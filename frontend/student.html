@@ -1,17 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Student | CampusSpace</title>
-    <link rel="stylesheet" href="/css/styles.css">
-  </head>
-  <body>
-    <main class="portal-page">
-      <a class="back-link" href="/">&#8592; All portals</a>
-      <p class="eyebrow">CampusSpace portal</p>
-      <h1>Student</h1>
-      <p>This portal is ready for student resource discovery and booking features.</p>
-    </main>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Student Dashboard | CampusSpace</title>
+  <link rel="stylesheet" href="student.css" />
+  <script src="student.js" defer></script>
+</head>
+<body>
+  <section class="login-screen" id="login-screen" aria-labelledby="login-title">
+    <div class="login-card">
+      <a class="brand brand--login" href="index.html"><span class="brand-mark">C</span> CampusSpace</a>
+      <p class="eyebrow">YOUR CAMPUS, MADE SIMPLE</p>
+      <h1 id="login-title">Welcome to your student space</h1>
+      <p class="muted">Sign in with your campus account to find teachers, rooms, and computer labs.</p>
+      <form id="login-form" class="login-form">
+        <label for="login-email">Campus email</label>
+        <input id="login-email" name="email" type="email" autocomplete="username" required />
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+        <button class="button button--primary button--wide" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="form-message" id="login-message" role="alert"></p>
+      <a class="back-link" href="index.html">← Back to CampusSpace</a>
+    </div>
+  </section>
+
+  <div class="app-shell" id="app-shell" hidden>
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="student.html"><span class="brand-mark">C</span> CampusSpace</a>
+      <p class="sidebar-label">STUDENT MENU</p>
+      <nav class="navigation" aria-label="Student navigation">
+        <button class="nav-item is-active" data-view="dashboard"><span class="nav-icon">⌂</span>Dashboard</button>
+        <button class="nav-item" data-view="teachers"><span class="nav-icon">♙</span>Find a Teacher</button>
+        <button class="nav-item" data-view="availability"><span class="nav-icon">◷</span>Teacher Availability</button>
+        <button class="nav-item" data-view="classrooms"><span class="nav-icon">▤</span>Find Free Classroom</button>
+        <button class="nav-item" data-view="labs"><span class="nav-icon">▦</span>Computer Labs</button>
+        <button class="nav-item" data-view="requests"><span class="nav-icon">▧</span>My Lab Requests</button>
+        <button class="nav-item" data-view="notifications"><span class="nav-icon">♧</span>Notifications<span class="nav-badge" id="notification-count" hidden></span></button>
+        <button class="nav-item" data-view="profile"><span class="nav-icon">◉</span>My Profile</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-help"><span class="help-icon">?</span><span><strong>Need a hand?</strong><small>Ask your campus office</small></span></div>
+        <button class="nav-item nav-logout" id="logout-button"><span class="nav-icon">↪</span>Logout</button>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button class="menu-button" id="menu-button" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <div class="breadcrumb"><span>Student portal</span><span class="breadcrumb-divider">/</span><strong id="view-name">Dashboard</strong></div>
+        <div class="topbar-profile"><span class="online-dot"></span><span id="student-email"></span><span class="user-avatar" id="user-avatar">S</span></div>
+      </header>
+      <main class="page-content" id="page-content" tabindex="-1"></main>
+      <footer class="page-footer">CampusSpace <span>·</span> Your campus, in one place</footer>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="backdrop" id="backdrop" hidden></div>
+</body>
 </html>
