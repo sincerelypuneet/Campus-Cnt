@@ -17,6 +17,7 @@ const files = [
   'laboratories.json',
   'lab_bookings.json',
   'notifications.json',
+  'announcements.json',
   'settings.json',
 ];
 

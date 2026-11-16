@@ -20,7 +20,7 @@ backend/
   server.js               HTTP server entry point
 ```
 
-The Express application serves the static frontend and exposes JSON endpoints under `/api`. Controllers handle HTTP concerns; services own reusable business and persistence logic. The file-storage service is the single boundary for JSON data files and restricts data filenames to simple `.json` names. The initial API includes only a health check; booking and resource features are intentionally not implemented yet.
+The Express application serves the static frontend and exposes JSON endpoints under `/api`. The student portal uses the authenticated student role to read faculty, timetable, classroom, lab, announcement, and student-specific notification/request records from the JSON data store. Students can view faculty profiles and timetables but cannot edit them. Lab access requests are stored with the signed-in student's account ID.
 
 ## Requirements
 
@@ -46,3 +46,4 @@ The application listens on `http://localhost:3000` by default. Set the `PORT` en
 
 - Visit `http://localhost:3000` to choose the Admin / Teacher or Student portal.
 - Visit `http://localhost:3000/api/health` to verify the JSON API.
+- Open the Student portal and sign in with a student account. Student accounts and campus resource records must already exist in the backend data files; the portal does not populate demo records.

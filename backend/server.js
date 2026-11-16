@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from './db.js';
+import { getDashboard, createLabRequest, markNotificationRead } from './controllers/studentController.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -51,6 +52,8 @@ function requireRole(...allowedRoles) {
     next();
   };
 }
+
+const handleAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 /** Login endpoint */
 app.post('/api/login', async (req, res) => {
@@ -263,6 +266,12 @@ app.get('/api/teacher/timetable', authenticate, requireRole('teacher'), async (r
   const tt = await db.find('timetable.json', r => r.teacherId === teacherId && r.active !== false);
   res.json(tt);
 });
+
+app.get('/api/student/dashboard', authenticate, requireRole('student'), handleAsync(getDashboard));
+
+app.post('/api/student/lab-requests', authenticate, requireRole('student'), handleAsync(createLabRequest));
+
+app.patch('/api/student/notifications/:id', authenticate, requireRole('student'), handleAsync(markNotificationRead));
 
 app.get('/api/student/free-classrooms', authenticate, requireRole('student'), async (req, res) => {
   const rooms = await db.read('classrooms.json');
