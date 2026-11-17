@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Find a Teacher | CampusSpace</title>
+  <link rel="stylesheet" href="teacher-finder.css" />
+  <script src="teacher-finder.js" defer></script>
+</head>
+<body>
+  <header class="finder-topbar">
+    <a class="brand" href="student.html"><span class="brand-mark">C</span> CampusSpace</a>
+    <a class="back-link" href="student.html">← Student dashboard</a>
+  </header>
+  <main class="finder-main">
+    <section class="intro">
+      <p class="eyebrow">FACULTY DIRECTORY</p>
+      <h1>Find a teacher</h1>
+      <p>Search faculty profiles, view published schedules, and check confirmed availability.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="search-title">
+      <div class="panel-heading">
+        <div><h2 id="search-title">Search faculty</h2><p>Use one or more filters to find a faculty member.</p></div>
+      </div>
+      <form id="teacher-search" class="search-form">
+        <label class="form-field"><span>Teacher name</span><input name="name" type="search" placeholder="Search by name" /></label>
+        <label class="form-field"><span>Department</span><select name="department"><option value="">All departments</option></select></label>
+        <label class="form-field"><span>Subject</span><select name="subject"><option value="">All subjects</option></select></label>
+        <label class="form-field"><span>Teacher ID</span><input name="teacherId" type="search" placeholder="Enter teacher ID" /></label>
+        <label class="form-field"><span>Designation</span><select name="designation"><option value="">All designations</option></select></label>
+        <div class="form-actions"><button class="button button--primary" type="submit">Search teachers</button></div>
+      </form>
+    </section>
+
+    <p id="finder-message" class="message" role="status" aria-live="polite"></p>
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="section-heading"><div><h2 id="results-title">Faculty members</h2><p id="results-summary">Search to see matching faculty profiles.</p></div></div>
+      <div id="teacher-results" class="teacher-results"></div>
+    </section>
+
+    <section id="teacher-profile" class="profile-section" hidden aria-labelledby="profile-name">
+      <button id="back-to-results" class="button button--quiet" type="button">← Back to search results</button>
+      <article class="panel profile-card">
+        <div class="profile-heading">
+          <div class="profile-avatar" id="profile-avatar" aria-hidden="true">T</div>
+          <div class="profile-title"><h2 id="profile-name"></h2><p id="profile-role"></p><span id="current-status" class="status"></span><p id="current-status-note" class="muted"></p></div>
+        </div>
+        <dl class="profile-details">
+          <div><dt>Department</dt><dd id="profile-department"></dd></div>
+          <div><dt>Subjects taught</dt><dd id="profile-subjects"></dd></div>
+          <div><dt>Assigned classrooms</dt><dd id="profile-classrooms"></dd></div>
+          <div><dt>Teacher ID</dt><dd id="profile-id"></dd></div>
+        </dl>
+      </article>
+
+      <section class="panel availability-panel" aria-labelledby="availability-title">
+        <div class="panel-heading"><div><h2 id="availability-title">Check availability</h2><p>Schedule gaps are not confirmed availability unless a confirmation is recorded.</p></div></div>
+        <form id="availability-search" class="availability-form">
+          <label class="form-field"><span>Date</span><input name="date" type="date" required /></label>
+          <label class="form-field"><span>Day</span><select name="day" required>
+            <option>Sunday</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option>
+          </select></label>
+          <label class="form-field"><span>Start time</span><input name="startTime" type="time" value="09:00" required /></label>
+          <label class="form-field"><span>End time</span><input name="endTime" type="time" value="10:00" required /></label>
+          <label class="form-field"><span>Department (optional)</span><select name="department"><option value="">All departments</option></select></label>
+          <div class="form-actions"><button class="button button--primary" type="submit">Check schedule</button></div>
+        </form>
+        <div id="availability-result" class="availability-result" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="profile-grid">
+        <article class="panel"><div class="section-heading"><div><h2>Today's schedule</h2><p>Published timetable entries for today.</p></div></div><div id="today-schedule" class="schedule-list"></div></article>
+        <article class="panel"><div class="section-heading"><div><h2>Upcoming classes</h2><p>The next scheduled classes.</p></div></div><div id="upcoming-classes" class="schedule-list"></div></article>
+        <article class="panel panel--wide"><div class="section-heading"><div><h2>Weekly timetable</h2><p>Published classes and scheduled commitments.</p></div></div><div id="weekly-timetable" class="schedule-list"></div></article>
+        <article class="panel panel--wide"><div class="section-heading"><div><h2>Free periods between classes</h2><p>These intervals are free from recorded classes, not confirmed availability.</p></div></div><div id="free-periods" class="free-period-list"></div></article>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

@@ -22,6 +22,10 @@ backend/
 
 The Express application serves the static frontend and exposes JSON endpoints under `/api`. The student portal uses the authenticated student role to read faculty, timetable, classroom, lab, announcement, and student-specific notification/request records from the JSON data store. Students can view faculty profiles and timetables but cannot edit them. Lab access requests are stored with the signed-in student's account ID.
 
+The classroom finder checks `classrooms.json`, `timetable.json`, `classroom_reservations.json`, and `classroom_maintenance.json` for each search. Searching never reserves a room; a student must explicitly choose **Reserve this room**, and the backend rechecks availability before saving the reservation.
+
+The teacher finder reads faculty, department, subject, and timetable records from their JSON files, plus `teacher_availability.json` for explicit confirmations. Timetable gaps are reported as free from classes, not as confirmed availability; a teacher is marked available only when a matching availability record confirms the requested interval. Optional `workingHours` on a teacher record can define the hours in which availability may be confirmed.
+
 ## Requirements
 
 - Node.js 18 or newer

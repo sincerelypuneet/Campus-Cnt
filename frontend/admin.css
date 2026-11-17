@@ -173,6 +173,7 @@ body {
   align-items: center;
   gap: 0.4rem;
   transition: background var(--transition-speed);
+  text-decoration: none;
 }
 .action-btn:hover {
   background: #357ab8;

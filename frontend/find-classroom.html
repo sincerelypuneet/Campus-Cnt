@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Find a Free Classroom | CampusSpace</title>
+  <link rel="stylesheet" href="classroom-finder.css" />
+  <script src="classroom-finder.js" defer></script>
+</head>
+<body>
+  <header class="finder-topbar">
+    <a class="brand" href="student.html"><span class="brand-mark">C</span> CampusSpace</a>
+    <a class="back-link" href="student.html">← Student dashboard</a>
+  </header>
+  <main class="finder-main">
+    <section class="intro">
+      <p class="eyebrow">CAMPUS RESOURCES</p>
+      <h1>Find a free classroom</h1>
+      <p>Search scheduled classes, reservations, and maintenance for an available room that fits your plans.</p>
+    </section>
+
+    <section class="finder-panel" aria-labelledby="search-title">
+      <div class="panel-heading">
+        <div><h2 id="search-title">Search availability</h2><p>Searching checks availability only. A room is reserved only after you choose Reserve.</p></div>
+        <span class="read-only">Availability search</span>
+      </div>
+      <form id="classroom-search" class="finder-form">
+        <label class="form-field"><span>Date</span><input name="date" type="date" required /></label>
+        <label class="form-field"><span>Start time</span><input name="startTime" type="time" required /></label>
+        <label class="form-field"><span>End time</span><input name="endTime" type="time" required /></label>
+        <label class="form-field"><span>Minimum seating capacity</span><input name="minCapacity" type="number" min="1" max="10000" value="1" required /></label>
+        <label class="form-field"><span>Building</span><select name="building"><option value="">All buildings</option></select></label>
+        <label class="form-field"><span>Floor</span><select name="floor"><option value="">All floors</option></select></label>
+        <div class="form-actions"><button class="button button--primary" type="submit">Search classrooms</button></div>
+      </form>
+    </section>
+
+    <p id="finder-message" class="message" role="status" aria-live="polite"></p>
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="results-heading"><div><h2 id="results-title">Available classrooms</h2><p id="results-summary">Choose a date and time to search.</p></div></div>
+      <div id="classroom-results" class="classroom-results"></div>
+    </section>
+  </main>
+</body>
+</html>

@@ -4,84 +4,156 @@
     "name": "Room 301",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "301",
+    "floorNumber": 3,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "6861acb4-25ee-4139-9968-232dca5f209f",
     "name": "Room 202",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "202",
+    "floorNumber": 2,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "b68defaf-1c65-408f-9906-660e4c9bf9dc",
     "name": "Lab 1",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "1",
+    "floorNumber": 1,
+    "seatingCapacity": 40,
+    "roomType": "Laboratory",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "043d55a9-6ea6-4880-8834-d779b2795ae8",
     "name": "Room 305",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "305",
+    "floorNumber": 3,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "bfa4ebd3-009f-4770-abac-0da0851f95d1",
     "name": "Room 204",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "204",
+    "floorNumber": 2,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "75724626-6e5c-48c2-b3ab-6b761a99ac32",
     "name": "Room 303",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "303",
+    "floorNumber": 3,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "7ffe3b7e-ea06-4848-80b6-207936076182",
     "name": "Room 203",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "203",
+    "floorNumber": 2,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "465bd756-9bb6-4238-9642-236055410629",
     "name": "Room 302",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "302",
+    "floorNumber": 3,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "8e779116-f897-407a-bb2f-85a7375068b2",
     "name": "Lab 2",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "2",
+    "floorNumber": 2,
+    "seatingCapacity": 40,
+    "roomType": "Laboratory",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "dc931548-e271-4883-ba60-2fbff204002a",
     "name": "Seminar Hall",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "Seminar Hall",
+    "floorNumber": null,
+    "seatingCapacity": 40,
+    "roomType": "Seminar hall",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "8f8874af-2c68-4e30-a905-832f33f56619",
     "name": "Library",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "Library",
+    "floorNumber": null,
+    "seatingCapacity": 40,
+    "roomType": "Library",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "e776b7c6-72a4-4de3-8d11-f6f58d7ca3cd",
     "name": "Ground",
     "building": "",
     "capacity": 40,
-    "resources": []
+    "resources": [],
+    "roomNumber": "Ground",
+    "floorNumber": 0,
+    "seatingCapacity": 40,
+    "roomType": "Outdoor space",
+    "availabilityStatus": "available",
+    "facilities": []
   },
   {
     "id": "c7160eee-2e1d-48c2-9828-0d89a6ef71e5",
@@ -89,6 +161,15 @@
     "building": "Main",
     "capacity": 40,
     "resources": [
+      "Projector",
+      "Whiteboard"
+    ],
+    "roomNumber": "101",
+    "floorNumber": 1,
+    "seatingCapacity": 40,
+    "roomType": "Classroom",
+    "availabilityStatus": "available",
+    "facilities": [
       "Projector",
       "Whiteboard"
     ]

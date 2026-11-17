@@ -89,6 +89,19 @@ async function add(fileName, record) {
   });
 }
 
+async function addIf(fileName, record, conflictsWith) {
+  const newRecord = { id: generateId(), ...record };
+  return queueWrite(fileName, async () => {
+    const data = await read(fileName);
+    if (!Array.isArray(data)) throw new Error(`${fileName} is not an array`);
+    const conflict = data.find(conflictsWith);
+    if (conflict) return { inserted: false, conflict };
+    data.push(newRecord);
+    await write(fileName, data);
+    return { inserted: true, record: newRecord };
+  });
+}
+
 /** Update an existing record by id */
 async function update(fileName, id, patch) {
   return queueWrite(fileName, async () => {
@@ -131,6 +144,7 @@ export default {
   read,
   write,
   add,
+  addIf,
   update,
   delete: del,
   getById,

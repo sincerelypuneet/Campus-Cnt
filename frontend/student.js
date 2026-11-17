@@ -202,7 +202,7 @@
     const cards = matched.map((teacher) => `<article class="teacher-card" role="button" tabindex="0" data-teacher="${escapeHtml(teacher.id)}">
       <div class="teacher-card-top"><span class="teacher-avatar">${escapeHtml(initials(teacher.fullName))}</span><div><h3>${escapeHtml(teacher.fullName)}</h3><p>${escapeHtml(teacher.designation || 'Faculty')}</p></div><span class="read-only">Read only</span></div>
       <p>${escapeHtml(teacher.department || 'Department not listed')}</p><p>${escapeHtml(teacher.email || 'Contact details not listed')}</p></article>`).join('');
-    return `${pageHeading('Find a Teacher', 'Search faculty profiles and view their published timetables. Faculty information is read-only.')}
+    return `${pageHeading('Find a Teacher', 'Search faculty profiles and view their published timetables. Faculty information is read-only.', '<a class="button button--primary" href="find-teacher.html">Open faculty finder</a>')}
       <div class="toolbar"><input class="input" id="teacher-search" type="search" placeholder="Name, subject, or department" value="${escapeHtml(searchTerm)}" aria-label="Search teachers" /></div>
       <section class="card-grid">${cards || emptyState('No teachers found', 'Try another name or ask your campus office about faculty directory access.')}</section>`;
   }
@@ -223,7 +223,7 @@
     const rooms = data.classrooms.map((room) => `<article class="info-card"><div class="section-title-row"><h3>${escapeHtml(room.name || 'Classroom')}</h3><span class="status ${room.availability === 'busy' ? 'status--busy' : room.availability === 'unknown' ? 'status--neutral' : ''}">${room.availability === 'busy' ? 'In use' : room.availability === 'unknown' ? 'No schedule' : 'Free now'}</span></div>
       <p>${escapeHtml([room.building, room.floor, room.classroomNumber && `Room ${room.classroomNumber}`].filter(Boolean).join(' · ') || 'Location not listed')}</p>
       <p>${escapeHtml([room.capacity && `${room.capacity} seats`, ...(room.resources || room.amenities || [])].filter(Boolean).join(' · ') || 'No room details listed')}</p></article>`).join('');
-    return `${pageHeading('Find a Free Classroom', `${available.length} room${available.length === 1 ? '' : 's'} without a scheduled class right now, based on today's timetable.`)}
+    return `${pageHeading('Find a Free Classroom', `${available.length} room${available.length === 1 ? '' : 's'} without a scheduled class right now, based on today's timetable.`, '<a class="button button--primary" href="find-classroom.html">Search by date &amp; time</a>')}
       <section class="card-grid">${rooms || emptyState('No classrooms listed', 'Classrooms will appear here when campus records are available.')}</section>`;
   }
 
@@ -354,6 +354,11 @@
         throw new Error('Please sign in with a student account.');
       }
       form.reset();
+      const next = new URLSearchParams(window.location.search).get('next');
+      if (['find-classroom.html', 'find-teacher.html'].includes(next)) {
+        window.location.assign(next);
+        return;
+      }
       await loadDashboard();
     } catch (error) {
       document.getElementById('login-message').textContent = error.message || 'Sign in failed. Check your campus email and password.';
