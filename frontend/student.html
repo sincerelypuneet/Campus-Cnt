@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e6f2ff" />
+  <title>Student Dashboard | CampusSpace</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <nav class="sidebar" id="sidebar" aria-label="Student navigation">
+      <div class="sidebar-header">
+        <h2>CampusSpace</h2>
+      </div>
+      <ul class="nav-list">
+        <li><a href="#dashboard" class="nav-link active" data-section="dashboard" aria-current="page">Dashboard</a></li>
+        <li><a href="#teachers" class="nav-link" data-section="teachers">Find a Teacher</a></li>
+        <li><a href="#availability" class="nav-link" data-section="availability">Teacher Availability</a></li>
+        <li><a href="#classrooms" class="nav-link" data-section="classrooms">Find Free Classroom</a></li>
+        <li><a href="#labs" class="nav-link" data-section="labs">Computer Labs</a></li>
+        <li><a href="#requests" class="nav-link" data-section="requests">My Lab Requests</a></li>
+        <li><a href="#notifications" class="nav-link" data-section="notifications">Notifications</a></li>
+        <li><a href="#profile" class="nav-link" data-section="profile">My Profile</a></li>
+        <li><a href="login-student.html" class="nav-link">Sign in</a></li>
+      </ul>
+    </nav>
+
+    <main class="content" id="main-content">
+      <header class="topbar">
+        <button class="toggle-btn" id="toggle-sidebar" type="button" aria-label="Toggle navigation">☰</button>
+        <div class="profile">
+          <span>Student Portal</span>
+          <span class="avatar" aria-hidden="true" style="display:grid;place-items:center;color:#fff;font-weight:600">S</span>
+        </div>
+      </header>
+
+      <section class="dashboard" id="dashboard-section">
+        <h1 class="section-title">Dashboard Overview</h1>
+        <div class="today-timetable">
+          <h2>Today's Timetable</h2>
+          <p id="timetable-empty" style="margin-top:12px;color:#667085">Your schedule will appear here when it is available.</p>
+        </div>
+        <div class="quick-actions" aria-label="Student quick actions">
+          <button class="action-btn" type="button" data-open-section="teachers">Find a Teacher</button>
+          <button class="action-btn" type="button" data-open-section="classrooms">Find a Classroom</button>
+          <button class="action-btn" type="button" data-open-section="labs">Explore Computer Labs</button>
+        </div>
+      </section>
+
+      <section class="dashboard" id="teachers-section" hidden>
+        <h1 class="section-title">Find a Teacher</h1>
+        <div class="today-timetable">
+          <h2>Teacher Directory</h2>
+          <p style="margin-top:12px;color:#667085">Teacher profiles and contact information will appear here.</p>
+        </div>
+      </section>
+
+      <section class="dashboard" id="availability-section" hidden>
+        <h1 class="section-title">Teacher Availability</h1>
+        <div class="today-timetable">
+          <h2>Today's Availability</h2>
+          <p style="margin-top:12px;color:#667085">Published teacher schedules will appear here.</p>
+        </div>
+      </section>
+
+      <section class="dashboard" id="classrooms-section" hidden>
+        <h1 class="section-title">Find a Free Classroom</h1>
+        <div class="today-timetable">
+          <h2>Classroom Availability</h2>
+          <p style="margin-top:12px;color:#667085">Classroom availability will appear here.</p>
+        </div>
+      </section>
+
+      <section class="dashboard" id="labs-section" hidden>
+        <h1 class="section-title">Computer Labs</h1>
+        <div class="today-timetable">
+          <h2>Campus Labs</h2>
+          <p style="margin-top:12px;color:#667085">Computer lab information will appear here.</p>
+        </div>
+      </section>
+
+      <section class="dashboard" id="requests-section" hidden>
+        <h1 class="section-title">My Lab Requests</h1>
+        <div class="today-timetable">
+          <h2>Request History</h2>
+          <p style="margin-top:12px;color:#667085">Your lab requests will appear here.</p>
+        </div>
+      </section>
+
+      <section class="dashboard" id="notifications-section" hidden>
+        <h1 class="section-title">Notifications</h1>
+        <div class="today-timetable">
+          <h2>Campus Updates</h2>
+          <p style="margin-top:12px;color:#667085">You have no notifications to display.</p>
+        </div>
+      </section>
+
+      <section class="dashboard" id="profile-section" hidden>
+        <h1 class="section-title">My Profile</h1>
+        <div class="today-timetable">
+          <h2>Student Account</h2>
+          <p style="margin-top:12px;color:#667085">Sign in to view your account information.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('sidebar');
+      const links = document.querySelectorAll('.nav-link[data-section]');
+      const sections = {
+        dashboard: document.getElementById('dashboard-section'),
+        teachers: document.getElementById('teachers-section'),
+        availability: document.getElementById('availability-section'),
+        classrooms: document.getElementById('classrooms-section'),
+        labs: document.getElementById('labs-section'),
+        requests: document.getElementById('requests-section'),
+        notifications: document.getElementById('notifications-section'),
+        profile: document.getElementById('profile-section')
+      };
+
+      function showSection(name) {
+        Object.entries(sections).forEach(([key, section]) => {
+          section.hidden = key !== name;
+        });
+        links.forEach((link) => {
+          const active = link.dataset.section === name;
+          link.classList.toggle('active', active);
+          if (active) link.setAttribute('aria-current', 'page');
+          else link.removeAttribute('aria-current');
+        });
+        sidebar.classList.remove('collapsed');
+      }
+
+      links.forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          showSection(link.dataset.section);
+        });
+      });
+
+      document.querySelectorAll('[data-open-section]').forEach((button) => {
+        button.addEventListener('click', () => showSection(button.dataset.openSection));
+      });
+
+      document.getElementById('toggle-sidebar').addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+      });
+    });
+  </script>
+</body>
+</html>
