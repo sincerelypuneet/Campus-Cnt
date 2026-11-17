@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Student Dashboard | CampusSpace</title>
+  <link rel="stylesheet" href="student.css" />
+  <script src="student.js" defer></script>
+</head>
+<body>
+  <section class="login-screen" id="login-screen" aria-labelledby="login-title">
+    <div class="login-card">
+      <a class="brand brand--login" href="index.html"><span class="brand-mark">C</span> CampusSpace</a>
+      <p class="eyebrow">YOUR CAMPUS, MADE SIMPLE</p>
+      <h1 id="login-title">Welcome to your student space</h1>
+      <p class="muted">Sign in with your campus account to find teachers, rooms, and computer labs.</p>
+      <form id="login-form" class="login-form">
+        <label for="login-email">Campus email</label>
+        <input id="login-email" name="email" type="email" autocomplete="username" required />
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+        <button class="button button--primary button--wide" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="form-message" id="login-message" role="alert"></p>
+      <a class="back-link" href="index.html">← Back to CampusSpace</a>
+    </div>
+  </section>
+</body>
+</html>
