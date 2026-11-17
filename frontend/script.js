@@ -12,8 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (studentCard) {
     studentCard.addEventListener('click', () => {
-      // Redirect to student login page (create student.html if needed)
-      window.location.href = 'student.html';
+      window.location.href = 'login-student.html';
     });
   }
 });
