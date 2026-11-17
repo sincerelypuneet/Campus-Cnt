@@ -1,0 +1,18 @@
+[
+  {
+    "id": "33708c9f-0cbe-4c64-89c5-67989f773b74",
+    "email": "admin@campusspace.local",
+    "passwordHash": "$2b$12$/FEYjaixe/STTGvbMBl6Se7cm/AX/IFaDUvpV81Wrbwa//Mw/cGE.",
+    "role": "admin",
+    "createdAt": "2026-11-16T12:33:42.699Z"
+  },
+  {
+    "id": "302ac734-cecf-4ce0-8596-4e88114a6a0d",
+    "email": "student@campusspace.local",
+    "passwordHash": "$2b$12$/OVvPSeIoFtBuyX17xrH4.8P6hp6tBjNSqeKcAkklg1NDc/TnGQ4C",
+    "role": "student",
+    "active": true,
+    "createdAt": "2026-11-17T04:37:32.125Z",
+    "studentId": "6fa966ef-9dd9-4f8b-8780-2fb1d43a3197"
+  }
+]

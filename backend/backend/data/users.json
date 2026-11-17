@@ -1,0 +1,9 @@
+[
+  {
+    "id": "25ddbf7a-7b34-451a-ab01-dc5437c37fcd",
+    "email": "admin@campusspace.local",
+    "passwordHash": "$2b$12$I7B66pREs2yJpp/NiWWPCO3mEa9rSL2BWKOrFYvME86i6kyTVhENy",
+    "role": "admin",
+    "createdAt": "2026-11-16T12:28:44.657Z"
+  }
+]

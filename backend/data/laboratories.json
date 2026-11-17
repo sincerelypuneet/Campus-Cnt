@@ -1,0 +1,12 @@
+[
+  {
+    "id": "95063a00-5279-452c-a298-f5bc6440dad3",
+    "name": "Lab A",
+    "building": "Science Block",
+    "equipment": [
+      "PCs",
+      "Arduino",
+      "Raspberry Pi"
+    ]
+  }
+]

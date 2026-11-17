@@ -1,0 +1,79 @@
+[
+  {
+    "id": "96a09598-1d60-49dd-9a7c-4f8a5942238e",
+    "name": "Data Structures",
+    "code": "CS201",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "4c5dfef5-5092-4325-b03f-002ec632b0aa",
+    "name": "Discrete Mathematics",
+    "code": "CS202",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "6b5fc579-4d3f-4cd0-834d-a5e067e872fe",
+    "name": "Database Systems",
+    "code": "CS203",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "94bca184-29ec-4b03-8249-ce13343e8cd3",
+    "name": "Operating Systems",
+    "code": "CS301",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "4374d5db-11df-4d41-891f-b182d14f19d5",
+    "name": "Computer Networks",
+    "code": "CS302",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "995def24-5cd1-4217-863e-5cde6fb95ce2",
+    "name": "Software Engineering",
+    "code": "CS303",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "0df34240-c4cb-474b-a5bd-966c39f398d5",
+    "name": "Algorithms",
+    "code": "CS304",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "38dc23a5-3e2d-4d93-9d7e-9c3f08084e24",
+    "name": "Theory of Computation",
+    "code": "CS305",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "cdce6152-dc65-4b03-9735-e8f08e71835a",
+    "name": "Web Technologies",
+    "code": "CS306",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "a0f10026-88a4-4dc3-8ab0-600885d7d1c7",
+    "name": "Professional Ethics",
+    "code": "HS301",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  },
+  {
+    "id": "e2952b53-0cda-44be-a6ca-ea16b7852416",
+    "name": "Seminar",
+    "code": "ACTIVITY",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "creditHours": 3
+  }
+]

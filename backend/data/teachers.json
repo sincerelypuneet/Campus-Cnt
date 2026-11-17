@@ -1,0 +1,201 @@
+[
+  {
+    "id": "2a60cddd-de64-4bce-8c2f-075823a36d8b",
+    "fullName": "Dr. A. Verma",
+    "email": "a.verma@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.202Z"
+  },
+  {
+    "id": "c9c5c000-4fff-4210-8087-fbed8f6df6f3",
+    "fullName": "Dr. K. Singh",
+    "email": "k.singh@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.207Z"
+  },
+  {
+    "id": "cccc5b36-9315-49b0-9070-4c1a8a0ee8cd",
+    "fullName": "Dr. M. Khan",
+    "email": "m.khan@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.214Z"
+  },
+  {
+    "id": "ef693171-66e2-42d4-960d-1fcea307bed2",
+    "fullName": "Dr. V. Nair",
+    "email": "v.nair@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.219Z"
+  },
+  {
+    "id": "2e96bd4f-ea31-4a01-97a1-ad92f4e763fc",
+    "fullName": "Dr. P. Sharma",
+    "email": "p.sharma@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.225Z"
+  },
+  {
+    "id": "2163e64c-eeda-48d4-bb2c-d0130124a6fe",
+    "fullName": "Dr. R. Mehta",
+    "email": "r.mehta@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.232Z"
+  },
+  {
+    "id": "48feabd8-037c-4a7b-bf15-24bd6ad11b67",
+    "fullName": "Dr. S. Iyer",
+    "email": "s.iyer@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Teacher",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.237Z"
+  },
+  {
+    "id": "d5016200-f9f6-459e-b846-da43485a04d9",
+    "fullName": "All Faculty",
+    "email": "faculty@campusspace.local",
+    "contactNumber": "",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Faculty",
+    "subjectsTaught": [],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-16T12:52:43.242Z"
+  },
+  {
+    "id": "fe680fba-9abc-4f2e-bed6-111aa7ddb18e",
+    "fullName": "Dr. Arjun Mehta",
+    "email": "arjun.mehta@college.edu",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Professor",
+    "subjectsTaught": [
+      "Data Structures",
+      "AI"
+    ],
+    "assignedClassrooms": [
+      "B-101",
+      "B-102"
+    ],
+    "active": true,
+    "contactNumber": "",
+    "profileImage": null,
+    "createdAt": "2026-11-16T14:44:39.150Z"
+  },
+  {
+    "id": "9cea0d1b-3aa4-4527-87f8-88a9958ed67b",
+    "fullName": "Dr. Neha Sharma",
+    "email": "neha.sharma@college.edu",
+    "departmentId": "b3184324-a53d-4528-b781-28f7ebaafad1",
+    "designation": "Associate Professor",
+    "subjectsTaught": [
+      "Calculus",
+      "Linear Algebra"
+    ],
+    "assignedClassrooms": [
+      "A-201",
+      "A-202"
+    ],
+    "active": true,
+    "contactNumber": "",
+    "profileImage": null,
+    "createdAt": "2026-11-16T14:44:39.152Z"
+  },
+  {
+    "id": "069c1dec-81d5-44da-8307-e6af59d8ef42",
+    "fullName": "Prof. Rohan Das",
+    "email": "rohan.das@college.edu",
+    "departmentId": "7a772002-c44f-4048-a246-3fa21b0c833f",
+    "designation": "Assistant Professor",
+    "subjectsTaught": [
+      "Mechanics",
+      "Optics"
+    ],
+    "assignedClassrooms": [
+      "C-301",
+      "C-302"
+    ],
+    "active": true,
+    "contactNumber": "",
+    "profileImage": null,
+    "createdAt": "2026-11-16T14:44:39.155Z"
+  },
+  {
+    "id": "bd3c5fb9-de8c-43aa-b05a-ec436bb7c2e4",
+    "fullName": "Dr. Priya Nair",
+    "email": "priya.nair@college.edu",
+    "departmentId": "b400bfd7-c1dd-40a1-b049-b2f9079e4ca2",
+    "designation": "Associate Professor",
+    "subjectsTaught": [
+      "Communication Skills",
+      "Literature"
+    ],
+    "assignedClassrooms": [
+      "D-101",
+      "D-102"
+    ],
+    "active": true,
+    "contactNumber": "",
+    "profileImage": null,
+    "createdAt": "2026-11-16T14:44:39.157Z"
+  },
+  {
+    "id": "9f13c0f4-fc66-4e74-9a19-146a6c4d6366",
+    "fullName": "Prof. Sameer Khan",
+    "email": "sameer.khan@college.edu",
+    "departmentId": "654d51b2-978a-4fbd-96fc-aa66d7ae8910",
+    "designation": "Assistant Professor",
+    "subjectsTaught": [
+      "Digital Electronics",
+      "Microprocessors"
+    ],
+    "assignedClassrooms": [
+      "E-201",
+      "E-202"
+    ],
+    "active": false,
+    "contactNumber": "",
+    "profileImage": null,
+    "createdAt": "2026-11-16T14:44:39.159Z"
+  }
+]

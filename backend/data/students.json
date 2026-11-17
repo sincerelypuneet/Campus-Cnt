@@ -1,0 +1,15 @@
+[
+  {
+    "id": "6fa966ef-9dd9-4f8b-8780-2fb1d43a3197",
+    "userId": "302ac734-cecf-4ce0-8596-4e88114a6a0d",
+    "email": "student@campusspace.local",
+    "fullName": "Alex Morgan",
+    "studentId": "CS26-001",
+    "program": "B.Sc. Computer Science",
+    "semester": "1st semester",
+    "department": "Computer Science",
+    "section": "A",
+    "active": true,
+    "createdAt": "2026-11-17T04:37:32.135Z"
+  }
+]

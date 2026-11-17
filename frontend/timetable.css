@@ -1,0 +1,59 @@
+.toolbar {
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.toolbar select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.timetable-grid {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--primary-white);
+}
+.timetable-grid th, .timetable-grid td {
+  border: 1px solid #d0d0d0;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+.timetable-grid th {
+  background: var(--primary-light-blue);
+}
+.timetable-grid tbody tr:hover {
+  background: #f5faff;
+}
+.timetable-actions {
+  white-space: nowrap;
+}
+.timetable-actions button {
+  margin-right: 0.35rem;
+}
+#entry-form label {
+  display: block;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+}
+#entry-form input,
+#entry-form select {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  margin-top: 0.2rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.form-error {
+  margin: 0.75rem 0;
+  color: #b42318;
+}
+.form-success {
+  margin: 0.75rem 0;
+  color: #18794e;
+}

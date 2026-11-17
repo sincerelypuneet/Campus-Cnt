@@ -25,6 +25,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  background: var(--primary-white);
 }
 .teacher-table th,
 .teacher-table td {
@@ -39,9 +40,36 @@
   background: #f5faff;
 }
 .action-icons {
+  border: 0;
+  border-radius: 5px;
+  color: white;
   cursor: pointer;
-  margin-right: 0.5rem;
-  color: var(--accent-blue);
+  margin-right: 0.35rem;
+  padding: 0.45rem 0.6rem;
+}
+.action-icons.edit {
+  background: #1683e8;
+}
+.action-icons.deactivate {
+  background: #e83d4b;
+}
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-badge.active {
+  color: #16783a;
+  background: #d7f5df;
+}
+.status-badge.inactive {
+  color: #a82331;
+  background: #fbdde0;
+}
+.teacher-actions {
+  white-space: nowrap;
 }
 
 /* Modal */

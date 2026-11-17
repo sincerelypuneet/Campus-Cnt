@@ -3,8 +3,9 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import { fileURLToPath } from 'url';
 
-const dataDir = path.resolve('backend', 'data');
+const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'data');
 const pendingWrites = new Map(); // filePath -> promise chain
 
 // Ensure data directory exists

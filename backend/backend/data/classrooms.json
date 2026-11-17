@@ -1,0 +1,96 @@
+[
+  {
+    "id": "778ff7ce-1451-4f2e-8cb5-126d3eb6e2c9",
+    "name": "Room 101",
+    "building": "Main",
+    "capacity": 40,
+    "resources": [
+      "Projector",
+      "Whiteboard"
+    ]
+  },
+  {
+    "id": "25a06634-ca3d-4006-b091-1d8346a0b5ab",
+    "name": "Room 301",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "5bbddf76-4715-43a4-9e06-f92b4b63ba07",
+    "name": "Room 202",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "b2e63cb4-34f4-41b8-94b7-4b6ab99b36d5",
+    "name": "Lab 1",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "e78a0c67-c226-4d9e-a0d2-07e518c562df",
+    "name": "Room 305",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "0740d581-83c4-4cc3-b025-bf27df693c7a",
+    "name": "Room 204",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "de3e23bf-90e0-4879-a7bb-d738e486d4fe",
+    "name": "Room 303",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "432f0be0-ca94-4df2-83f2-fe01ecce8dbb",
+    "name": "Room 203",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "71397a99-6826-4abc-acbd-fe20cfb9aa02",
+    "name": "Room 302",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "bdfb711e-273c-4022-a882-9ee821578ae0",
+    "name": "Lab 2",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "d5412ca1-6bbb-445d-bee5-11eb5d37d941",
+    "name": "Seminar Hall",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "12876550-1887-43b4-b21b-1ec272e59b07",
+    "name": "Library",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  },
+  {
+    "id": "35b91d48-1870-4e97-a71c-df73def7cedf",
+    "name": "Ground",
+    "building": "",
+    "capacity": 40,
+    "resources": []
+  }
+]

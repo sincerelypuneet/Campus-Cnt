@@ -1,0 +1,27 @@
+[
+  {
+    "id": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "name": "Computer Science",
+    "code": "CS"
+  },
+  {
+    "id": "b3184324-a53d-4528-b781-28f7ebaafad1",
+    "name": "Mathematics",
+    "code": "MA"
+  },
+  {
+    "id": "7a772002-c44f-4048-a246-3fa21b0c833f",
+    "name": "Physics",
+    "code": "PH"
+  },
+  {
+    "id": "b400bfd7-c1dd-40a1-b049-b2f9079e4ca2",
+    "name": "English",
+    "code": "EN"
+  },
+  {
+    "id": "654d51b2-978a-4fbd-96fc-aa66d7ae8910",
+    "name": "Electronics",
+    "code": "EL"
+  }
+]

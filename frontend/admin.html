@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CampusSpace – Admin Dashboard</title>
   <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="teachers.css" />
+  <link rel="stylesheet" href="timetable.css" />
   <!-- Font Awesome for icons -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
@@ -58,14 +60,122 @@
           <button class="action-btn" id="create-classroom"><i class="fas fa-plus"></i> Create Classroom</button>
         </div>
       </section>
-      <!-- Placeholder sections for other pages -->
-      <section class="placeholder" id="placeholder-section" style="display:none;">
+      <section class="dashboard" id="teachers-section" hidden>
+        <h1 class="section-title">Teacher Management</h1>
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="Search teachers by name or email..." />
+          <select id="dept-filter">
+            <option value="">All Departments</option>
+          </select>
+          <button id="search-btn" class="action-btn"><i class="fas fa-search"></i> Search</button>
+        </div>
+        <button id="add-teacher-btn" class="action-btn"><i class="fas fa-plus"></i> Add Teacher</button>
+        <div class="table-scroll">
+          <table class="teacher-table" id="teacher-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Subjects</th>
+                <th>Classrooms</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="dashboard" id="timetable-section" hidden>
+        <h1 class="section-title">Timetable Management</h1>
+        <div class="toolbar">
+          <button id="add-entry" class="action-btn"><i class="fas fa-plus"></i> Add Entry</button>
+          <label for="view-mode">View</label>
+          <select id="view-mode">
+            <option value="weekly">Weekly View</option>
+            <option value="daily">Today</option>
+          </select>
+        </div>
+        <div class="table-scroll">
+          <table class="timetable-grid" id="timetable-container">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th>Class</th>
+                <th>Room</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="placeholder" id="placeholder-section" hidden>
         <h2>Coming Soon</h2>
         <p>This section will be developed later.</p>
       </section>
+
+      <div class="modal" id="teacher-modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="teacher-modal-title">
+          <button type="button" class="close" id="modal-close" aria-label="Close">&times;</button>
+          <h2 id="modal-title">Add Teacher</h2>
+          <form id="teacher-form">
+            <label>Full Name<input type="text" name="fullName" required /></label>
+            <label>Email<input type="email" name="email" required /></label>
+            <label>Contact Number<input type="text" name="contactNumber" /></label>
+            <label>Department<select name="departmentId" id="dept-select" required></select></label>
+            <label>Designation<input type="text" name="designation" required /></label>
+            <label>Subjects Taught (comma-separated IDs)<input type="text" name="subjectsTaught" /></label>
+            <label>Assigned Classrooms (comma-separated IDs)<input type="text" name="assignedClassrooms" /></label>
+            <label>Profile Image URL (optional)<input type="url" name="profileImage" /></label>
+            <label>Initial Password<input type="password" name="password" /></label>
+            <button type="submit" class="action-btn">Save</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="modal" id="entry-modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="entry-modal-title">
+          <button type="button" class="close" id="entry-modal-close" aria-label="Close">&times;</button>
+          <h2 id="entry-modal-title">Add Timetable Entry</h2>
+          <form id="entry-form">
+            <label>Teacher<select name="teacherId" id="teacher-select" required></select></label>
+            <label>Subject Name<input type="text" name="subjectName" required /></label>
+            <label>Subject Code<input type="text" name="subjectCode" required /></label>
+            <label>Department<select name="departmentId" id="timetable-dept-select" required></select></label>
+            <label>Class / Semester<input type="text" name="classOrSemester" required /></label>
+            <label>Section<input type="text" name="section" required /></label>
+            <label>Day<select name="day" required>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select></label>
+            <label>Start Time<input type="time" name="startTime" required /></label>
+            <label>End Time<input type="time" name="endTime" required /></label>
+            <label>Building<input type="text" name="building" required /></label>
+            <label>Floor<input type="text" name="floor" /></label>
+            <label>Classroom<select name="classroomId" id="classroom-select" required></select></label>
+            <label>Classroom Number<input type="text" name="classroomNumber" required /></label>
+            <button type="submit" class="action-btn">Save</button>
+          </form>
+        </div>
+      </div>
     </main>
   </div>
 
   <script src="admin.js"></script>
+  <script src="teachers.js"></script>
+  <script src="timetable.js"></script>
 </body>
 </html>

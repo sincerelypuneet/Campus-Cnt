@@ -284,6 +284,11 @@ app.get('/api/admin/departments', authenticate, requireRole('admin'), async (req
   res.json(departments);
 });
 
+app.get('/api/admin/classrooms', authenticate, requireRole('admin'), async (req, res) => {
+  const classrooms = await db.read('classrooms.json');
+  res.json(classrooms);
+});
+
 // Admin: Manage any teacher's timetable (full CRUD)
 app.get('/api/admin/timetable', authenticate, requireRole('admin'), async (req, res) => {
   const all = await db.read('timetable.json');

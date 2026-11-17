@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalTitle = document.getElementById('modal-title');
   const form = document.getElementById('teacher-form');
   const deptSelect = document.getElementById('dept-select');
+  const departmentNames = new Map();
+  let teacherRecords = [];
 
   // Helper: fetch JSON with credentials
   const fetchJSON = (url, opts = {}) => fetch(url, { credentials: 'include', ...opts }).then(r => {
@@ -24,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     deptFilter.innerHTML = '<option value="">All Departments</option>';
     deptSelect.innerHTML = '<option value="">Select Department</option>';
     deps.forEach(d => {
+      departmentNames.set(d.id, d.name);
       const opt = document.createElement('option');
       opt.value = d.id;
       opt.textContent = d.name;
@@ -34,21 +37,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Render teacher rows
   function renderTeachers(teachers) {
-    teacherTableBody.innerHTML = '';
+    teacherTableBody.replaceChildren();
     teachers.forEach(t => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${t.fullName || ''}</td>
-        <td>${t.email || ''}</td>
-        <td>${t.departmentId || ''}</td>
-        <td>${t.designation || ''}</td>
-        <td>${(t.subjectsTaught || []).join(', ')}</td>
-        <td>${(t.assignedClassrooms || []).join(', ')}</td>
-        <td>${t.active ? 'Active' : 'Inactive'}</td>
-        <td>
-          <i class="fas fa-edit action-icons" data-id="${t.id}" title="Edit"></i>
-          <i class="fas fa-trash-alt action-icons" data-id="${t.id}" title="Deactivate"></i>
-        </td>`;
+      [
+        t.fullName,
+        t.email,
+        departmentNames.get(t.departmentId) || t.departmentId,
+        t.designation,
+        (t.subjectsTaught || []).join(', '),
+        (t.assignedClassrooms || []).join(', '),
+      ].forEach(value => {
+        tr.insertCell().textContent = value || '';
+      });
+
+      const status = document.createElement('span');
+      status.className = `status-badge ${t.active === false ? 'inactive' : 'active'}`;
+      status.textContent = t.active === false ? 'Inactive' : 'Active';
+      tr.insertCell().appendChild(status);
+
+      const actions = tr.insertCell();
+      actions.className = 'teacher-actions';
+      const editButton = document.createElement('button');
+      editButton.type = 'button';
+      editButton.className = 'action-icons edit';
+      editButton.dataset.id = t.id;
+      editButton.dataset.action = 'edit';
+      editButton.title = 'Edit';
+      editButton.setAttribute('aria-label', `Edit ${t.fullName}`);
+      editButton.innerHTML = '<i class="fas fa-edit" aria-hidden="true"></i>';
+
+      const deactivateButton = document.createElement('button');
+      deactivateButton.type = 'button';
+      deactivateButton.className = 'action-icons deactivate';
+      deactivateButton.dataset.id = t.id;
+      deactivateButton.dataset.action = 'deactivate';
+      deactivateButton.title = 'Deactivate';
+      deactivateButton.setAttribute('aria-label', `Deactivate ${t.fullName}`);
+      deactivateButton.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i>';
+      actions.append(editButton, deactivateButton);
       teacherTableBody.appendChild(tr);
     });
   }
@@ -62,14 +89,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dept) query.append('department', dept);
     const url = '/api/admin/teachers' + (query.toString() ? `?${query}` : '');
     const data = await fetchJSON(url);
+    teacherRecords = data;
     renderTeachers(data);
   }
 
   // Show modal for add / edit
   function openModal(isEdit = false, teacher = null) {
     modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
     modalTitle.textContent = isEdit ? 'Edit Teacher' : 'Add Teacher';
     form.reset();
+    form.password.required = !isEdit;
     // Populate fields if edit
     if (isEdit && teacher) {
       form.fullName.value = teacher.fullName || '';
@@ -91,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close modal
   function closeModal() {
     modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
   }
 
   // Submit add / edit form
@@ -134,25 +165,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Table action icons (edit / deactivate)
   teacherTableBody.addEventListener('click', async e => {
-    const target = e.target;
-    if (target.classList.contains('action-icons')) {
-      const id = target.dataset.id;
-      if (target.title === 'Edit') {
-        // Fetch teacher details for edit (could reuse list data but fetch single for freshness)
-        const teacher = await fetchJSON(`/api/admin/teachers/${id}`);
+    const target = e.target.closest('button[data-action]');
+    if (!target) return;
+    const teacher = teacherRecords.find(item => item.id === target.dataset.id);
+    if (!teacher) return;
+    try {
+      if (target.dataset.action === 'edit') {
         openModal(true, teacher);
-      } else if (target.title === 'Deactivate') {
-        if (confirm('Are you sure you want to deactivate this teacher?')) {
-          await fetchJSON(`/api/admin/teachers/${id}`, { method: 'DELETE' });
-          loadTeachers();
-        }
+      } else if (confirm('Are you sure you want to deactivate this teacher?')) {
+        await fetchJSON(`/api/admin/teachers/${encodeURIComponent(teacher.id)}`, { method: 'DELETE' });
+        await loadTeachers();
       }
+    } catch (err) {
+      alert(err.message || 'Operation failed');
     }
   });
 
   // Search & filter actions
-  searchBtn.addEventListener('click', loadTeachers);
-  deptFilter.addEventListener('change', loadTeachers);
+  const reloadTeachers = () => loadTeachers().catch(err => alert(err.message || 'Unable to load teachers'));
+  searchBtn.addEventListener('click', reloadTeachers);
+  deptFilter.addEventListener('change', reloadTeachers);
 
   // Add button
   addBtn.addEventListener('click', () => openModal(false));
@@ -164,5 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initial load
-  loadDepartments().then(loadTeachers).catch(err => console.error('Init error', err));
+  loadDepartments().then(loadTeachers).catch(err => {
+    console.error('Teacher management initialization failed:', err);
+  });
 });

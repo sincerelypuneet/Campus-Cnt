@@ -46,18 +46,99 @@ async function createInitialAdmin() {
 }
 
 async function seedSampleData() {
-  // Departments
-  const dept = await db.add('departments.json', { name: 'Computer Science', code: 'CS' });
+  async function ensureRecord(fileName, matches, record) {
+    const records = await db.read(fileName);
+    return records.find(matches) || db.add(fileName, record);
+  }
 
-  // Subjects
-  await db.add('subjects.json', { name: 'Data Structures', code: 'CS201', departmentId: dept.id, creditHours: 3 });
-  await db.add('subjects.json', { name: 'Operating Systems', code: 'CS301', departmentId: dept.id, creditHours: 4 });
+  const departmentNames = ['Computer Science', 'Mathematics', 'Physics', 'English', 'Electronics'];
+  const departments = {};
+  for (const name of departmentNames) {
+    const code = name === 'Computer Science' ? 'CS' : name.slice(0, 2).toUpperCase();
+    departments[name] = await ensureRecord(
+      'departments.json',
+      department => department.name === name,
+      { name, code },
+    );
+  }
 
-  // Classrooms
-  await db.add('classrooms.json', { name: 'Room 101', building: 'Main', capacity: 40, resources: ['Projector', 'Whiteboard'] });
+  await ensureRecord(
+    'subjects.json',
+    subject => subject.code === 'CS201',
+    { name: 'Data Structures', code: 'CS201', departmentId: departments['Computer Science'].id, creditHours: 3 },
+  );
+  await ensureRecord(
+    'subjects.json',
+    subject => subject.code === 'CS301',
+    { name: 'Operating Systems', code: 'CS301', departmentId: departments['Computer Science'].id, creditHours: 4 },
+  );
+  await ensureRecord(
+    'classrooms.json',
+    classroom => classroom.name === 'Room 101',
+    { name: 'Room 101', building: 'Main', capacity: 40, resources: ['Projector', 'Whiteboard'] },
+  );
+  await ensureRecord(
+    'laboratories.json',
+    laboratory => laboratory.name === 'Lab A',
+    { name: 'Lab A', building: 'Science Block', equipment: ['PCs', 'Arduino', 'Raspberry Pi'] },
+  );
 
-  // Laboratories
-  await db.add('laboratories.json', { name: 'Lab A', building: 'Science Block', equipment: ['PCs', 'Arduino', 'Raspberry Pi'] });
+  const demoTeachers = [
+    {
+      fullName: 'Dr. Arjun Mehta',
+      email: 'arjun.mehta@college.edu',
+      departmentId: departments['Computer Science'].id,
+      designation: 'Professor',
+      subjectsTaught: ['Data Structures', 'AI'],
+      assignedClassrooms: ['B-101', 'B-102'],
+      active: true,
+    },
+    {
+      fullName: 'Dr. Neha Sharma',
+      email: 'neha.sharma@college.edu',
+      departmentId: departments.Mathematics.id,
+      designation: 'Associate Professor',
+      subjectsTaught: ['Calculus', 'Linear Algebra'],
+      assignedClassrooms: ['A-201', 'A-202'],
+      active: true,
+    },
+    {
+      fullName: 'Prof. Rohan Das',
+      email: 'rohan.das@college.edu',
+      departmentId: departments.Physics.id,
+      designation: 'Assistant Professor',
+      subjectsTaught: ['Mechanics', 'Optics'],
+      assignedClassrooms: ['C-301', 'C-302'],
+      active: true,
+    },
+    {
+      fullName: 'Dr. Priya Nair',
+      email: 'priya.nair@college.edu',
+      departmentId: departments.English.id,
+      designation: 'Associate Professor',
+      subjectsTaught: ['Communication Skills', 'Literature'],
+      assignedClassrooms: ['D-101', 'D-102'],
+      active: true,
+    },
+    {
+      fullName: 'Prof. Sameer Khan',
+      email: 'sameer.khan@college.edu',
+      departmentId: departments.Electronics.id,
+      designation: 'Assistant Professor',
+      subjectsTaught: ['Digital Electronics', 'Microprocessors'],
+      assignedClassrooms: ['E-201', 'E-202'],
+      active: false,
+    },
+  ];
+
+  for (const teacher of demoTeachers) {
+    await ensureRecord('teachers.json', existing => existing.email === teacher.email, {
+      ...teacher,
+      contactNumber: '',
+      profileImage: null,
+      createdAt: new Date().toISOString(),
+    });
+  }
 }
 
 async function main() {
