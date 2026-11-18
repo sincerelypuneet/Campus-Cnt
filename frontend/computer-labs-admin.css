@@ -1,0 +1,55 @@
+.admin-lab-intro { margin: -5px 0 18px; color: #647086; font-size: 13px; }
+.admin-lab-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.admin-lab-panel { margin-bottom: 16px; padding: 18px; border: 1px solid #e4e9f1; border-radius: 12px; background: #fff; box-shadow: 0 3px 14px #25324b0a; }
+.admin-lab-panel h2 { margin: 0 0 13px; font-size: 16px; }
+.admin-lab-muted { margin: 6px 0; color: #7d8798; font-size: 11px; }
+.admin-lab-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.admin-lab-form label, .admin-add-pc-form label { display: grid; gap: 5px; color: #566176; font-size: 11px; font-weight: 650; }
+.admin-lab-form input, .admin-lab-form select, .admin-lab-form textarea, .admin-add-pc-form input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid #dfe4ed; border-radius: 7px; color: #20283a; background: #fff; font: inherit; font-size: 12px; }
+.admin-lab-form textarea { resize: vertical; }
+.admin-lab-wide { grid-column: 1 / -1; }
+.admin-utilization-form { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; }
+.admin-lab-message { min-height: 20px; margin: -6px 0 10px; color: #a0444b; font-size: 12px; }
+.admin-lab-message.is-success { color: #23876c; }
+.admin-lab-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.admin-lab-card { min-width: 0; padding: 15px; border: 1px solid #e7ebf2; border-radius: 10px; }
+.admin-lab-card h3 { margin: 0; font-size: 14px; }
+.admin-lab-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; grid-column: 1 / -1; }
+.admin-category { padding: 5px 8px; border-radius: 14px; color: #5c52bf; background: #f0efff; font-size: 9px; font-weight: 750; }
+.admin-edit-lab-form { margin-bottom: 14px; }
+.admin-lab-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.admin-small-button { padding: 7px 10px; border: 0; border-radius: 7px; color: #fff; background: #6558d3; font-size: 10px; font-weight: 700; }
+.admin-small-button:hover { background: #5144bd; }
+.admin-small-button:disabled { cursor: wait; opacity: .6; }
+.admin-danger-button { color: #a0444b; background: #fff0f0; }
+.admin-danger-button:hover { color: #fff; background: #a0444b; }
+.admin-pc-section { padding-top: 12px; border-top: 1px solid #edf0f5; }
+.admin-pc-section h4 { margin: 0 0 8px; font-size: 12px; }
+.admin-utilization-summary { margin: 0 0 8px; color: #5f6880; font-size: 10px; font-weight: 700; }
+.admin-pc-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid #f0f2f6; }
+.admin-pc-row strong { display: block; font-size: 11px; }
+.admin-pc-row small { display: block; margin-top: 4px; font-size: 9px; }
+.admin-pc-row .is-occupied { color: #a0444b; }
+.admin-pc-row .is-available { color: #23876c; }
+.admin-add-pc-form { display: flex; align-items: end; gap: 8px; margin-top: 10px; }
+.admin-add-pc-form label { flex: 1; }
+.admin-request-list { display: grid; }
+.admin-hpc-request { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid #edf0f5; }
+.admin-hpc-copy { min-width: 0; flex: 1; }
+.admin-hpc-copy strong { font-size: 11px; }
+.admin-hpc-copy small { display: block; margin-top: 5px; color: #7d8798; font-size: 10px; }
+.admin-hpc-copy p { margin: 6px 0 0; color: #566176; font-size: 10px; line-height: 1.4; }
+.admin-request-status { padding: 5px 8px; border-radius: 13px; color: #23876c; background: #e9f7f1; font-size: 9px; font-weight: 750; }
+.admin-request-status.is-pending { color: #a96d2e; background: #fff4e8; }
+.admin-request-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+@media (max-width: 900px) {
+  .admin-lab-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  .admin-lab-layout { grid-template-columns: 1fr; }
+  .admin-lab-form, .admin-utilization-form { grid-template-columns: 1fr 1fr; }
+  .admin-lab-wide { grid-column: 1 / -1; }
+  .admin-hpc-request { flex-wrap: wrap; }
+  .admin-hpc-copy { flex-basis: calc(100% - 25px); }
+}

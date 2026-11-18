@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Computer Laboratories | CampusSpace</title>
+  <link rel="stylesheet" href="computer-labs.css" />
+  <script src="computer-labs.js" defer></script>
+</head>
+<body>
+  <main class="lab-app">
+    <header class="lab-header">
+      <a class="brand" href="student.html"><span class="brand-mark">C</span> CampusSpace</a>
+      <a class="back-link" href="student.html">← Student dashboard</a>
+    </header>
+
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">CAMPUS RESOURCES</p>
+        <h1>Computer Laboratories</h1>
+        <p class="muted">Check workstation availability or send an HPC request to the Lab Head.</p>
+      </div>
+      <a class="button button--quiet" href="#my-requests">My lab requests</a>
+    </section>
+
+    <p class="message" id="page-message" role="status" aria-live="polite"></p>
+
+    <section class="panel" aria-labelledby="availability-heading">
+      <div class="section-title-row">
+        <div><h2 id="availability-heading">Check PC availability</h2><p class="muted">Choose a time to see which LPC computers are free.</p></div>
+      </div>
+      <form class="availability-form" id="availability-form">
+        <label>Date<input class="input" type="date" name="date" required /></label>
+        <label>Start time<input class="input" type="time" name="startTime" required /></label>
+        <label>End time<input class="input" type="time" name="endTime" required /></label>
+        <button class="button button--primary" type="submit">Check availability</button>
+      </form>
+    </section>
+
+    <section class="lab-section" aria-labelledby="labs-heading">
+      <div class="section-title-row">
+        <div><h2 id="labs-heading">Laboratories</h2><p class="muted">LPC reservations are confirmed immediately. HPC reservations require approval.</p></div>
+        <div class="category-switch" role="group" aria-label="Filter laboratories">
+          <button type="button" class="category-button is-active" data-category="LPC">LPC</button>
+          <button type="button" class="category-button" data-category="HPC">HPC</button>
+        </div>
+      </div>
+      <div class="lab-grid" id="lab-list"></div>
+    </section>
+
+    <section class="panel hpc-panel" id="hpc-request-panel" aria-labelledby="hpc-heading" hidden>
+      <div class="section-title-row">
+        <div><h2 id="hpc-heading">Request an HPC session</h2><p class="muted">A PC is assigned only after Lab Head/Admin approval.</p></div>
+      </div>
+      <form class="request-form" id="hpc-request-form">
+        <label>Laboratory<select class="input" name="labId" id="hpc-lab-select" required></select></label>
+        <label>Student ID<input class="input" type="text" name="studentId" maxlength="120" required /></label>
+        <label>Student name<input class="input" type="text" name="name" maxlength="120" required /></label>
+        <label>Date<input class="input" type="date" name="date" required /></label>
+        <label>Start time<input class="input" type="time" name="startTime" required /></label>
+        <label>End time<input class="input" type="time" name="endTime" required /></label>
+        <label class="form-wide">Purpose<textarea class="input" name="purpose" maxlength="500" rows="3" required></textarea></label>
+        <div class="form-wide"><button class="button button--primary" type="submit">Submit booking request</button></div>
+      </form>
+    </section>
+
+    <section class="panel requests-panel" id="my-requests" aria-labelledby="requests-heading">
+      <div class="section-title-row">
+        <div><h2 id="requests-heading">My bookings and requests</h2><p class="muted">Track LPC confirmations and HPC decisions.</p></div>
+        <button type="button" class="button button--quiet" id="refresh-requests">Refresh</button>
+      </div>
+      <div class="request-list" id="request-list"></div>
+    </section>
+  </main>
+</body>
+</html>

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboard: document.getElementById('dashboard-section'),
     teachers: document.getElementById('teachers-section'),
     timetable: document.getElementById('timetable-section'),
+    labs: document.getElementById('labs-section'),
     placeholder: document.getElementById('placeholder-section'),
   };
   const sidebar = document.getElementById('sidebar');

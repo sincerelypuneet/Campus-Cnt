@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="admin.css" />
   <link rel="stylesheet" href="teachers.css" />
   <link rel="stylesheet" href="timetable.css" />
+  <link rel="stylesheet" href="computer-labs-admin.css" />
   <!-- Font Awesome for icons -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
@@ -19,14 +20,14 @@
       </div>
       <ul class="nav-list">
         <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        
+        
         <li><a href="#" class="nav-link" data-section="teachers"><i class="fas fa-chalkboard-teacher"></i> Teacher Management</a></li>
-        <li><a href="#" class="nav-link" data-section="students"><i class="fas fa-user-graduate"></i> Student Management</a></li>
-        <li><a href="#" class="nav-link" data-section="departments"><i class="fas fa-building"></i> Department Management</a></li>
-        <li><a href="#" class="nav-link" data-section="subjects"><i class="fas fa-book"></i> Subject Management</a></li>
+        
         <li><a href="#" class="nav-link" data-section="classrooms"><i class="fas fa-door-open"></i> Classroom Management</a></li>
         <li><a href="#" class="nav-link" data-section="timetable"><i class="fas fa-calendar-alt"></i> Timetable Management</a></li>
         <li><a href="#" class="nav-link" data-section="labs"><i class="fas fa-flask"></i> Laboratory Management</a></li>
-        <li><a href="#" class="nav-link" data-section="bookings"><i class="fas fa-clipboard-list"></i> Booking Management</a></li>
+        
         <li><a href="#" class="nav-link" data-section="notifications"><i class="fas fa-bell"></i> Notifications</a></li>
         <li><a href="#" class="nav-link" data-section="settings"><i class="fas fa-cog"></i> Settings</a></li>
         <li><a href="#" class="nav-link" id="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -117,6 +118,43 @@
         </div>
       </section>
 
+      <section class="dashboard" id="labs-section" hidden>
+        <h1 class="section-title">Computer Laboratory Management</h1>
+        <p class="admin-lab-intro">Manage LPC/HPC laboratories and computers, review HPC requests, and check workstation utilization.</p>
+        <div class="admin-lab-layout">
+          <section class="admin-lab-panel">
+            <h2>Add a laboratory</h2>
+            <form id="admin-lab-create-form" class="admin-lab-form">
+              <label>Laboratory name<input name="name" maxlength="120" required /></label>
+              <label>Category<select name="category" required><option value="LPC">LPC – Low Performance Computing</option><option value="HPC">HPC – High Performance Computing</option></select></label>
+              <label>Building<input name="building" maxlength="120" required /></label>
+              <label>Room<input name="room" maxlength="80" /></label>
+              <label class="admin-lab-wide">Description<textarea name="description" maxlength="500" rows="2"></textarea></label>
+              <button class="action-btn" type="submit">Add laboratory</button>
+            </form>
+          </section>
+          <section class="admin-lab-panel">
+            <h2>Lab utilization</h2>
+            <p class="admin-lab-muted">Choose a time to see available and occupied computers.</p>
+            <form id="admin-lab-utilization-form" class="admin-lab-form admin-utilization-form">
+              <label>Date<input name="date" type="date" required /></label>
+              <label>Start time<input name="startTime" type="time" required /></label>
+              <label>End time<input name="endTime" type="time" required /></label>
+              <button class="action-btn" type="submit">Check utilization</button>
+            </form>
+          </section>
+        </div>
+        <p class="admin-lab-message" id="admin-lab-message" role="status" aria-live="polite"></p>
+        <section class="admin-lab-panel">
+          <h2>Laboratories and PCs</h2>
+          <div class="admin-lab-list" id="admin-lab-list"></div>
+        </section>
+        <section class="admin-lab-panel admin-request-panel">
+          <h2>HPC booking requests</h2>
+          <div class="admin-request-list" id="admin-hpc-request-list"></div>
+        </section>
+      </section>
+
       <section class="placeholder" id="placeholder-section" hidden>
         <h2>Coming Soon</h2>
         <p>This section will be developed later.</p>
@@ -177,5 +215,6 @@
   <script src="admin.js"></script>
   <script src="teachers.js"></script>
   <script src="timetable.js"></script>
+  <script src="computer-labs-admin.js"></script>
 </body>
 </html>

@@ -19,6 +19,13 @@ import {
   validDateKey as validTeacherDateKey,
   weekdayForDate,
 } from './services/teacherAvailability.js';
+import {
+  isValidDateKey as isValidComputerLabDate,
+  minuteOfDay as computerLabMinuteOfDay,
+  overlaps as computerLabOverlaps,
+  reservationConflicts,
+  reservesComputer,
+} from './services/computerLabs.js';
 import { getDashboard, createLabRequest, markNotificationRead } from './controllers/studentController.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -68,6 +75,46 @@ function requireRole(...allowedRoles) {
 }
 
 const handleAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
+
+function validateComputerLabTime(input) {
+  const { date, startTime, endTime } = input || {};
+  const start = computerLabMinuteOfDay(startTime);
+  const end = computerLabMinuteOfDay(endTime);
+  const now = new Date();
+  const today = localDateKey(now);
+  if (!isValidComputerLabDate(date) || date < today) {
+    return { error: 'Choose a valid date that is today or later.' };
+  }
+  if (start === null || end === null || start >= end) {
+    return { error: 'Enter valid 24-hour times, with the end time after the start time.' };
+  }
+  if (date === today && start <= now.getHours() * 60 + now.getMinutes()) {
+    return { error: 'Choose a start time that has not passed.' };
+  }
+  return { value: { date, startTime, endTime } };
+}
+
+async function getComputerLabStudent(user) {
+  const [students, users] = await Promise.all([db.read('students.json'), db.read('users.json')]);
+  const account = users.find((item) => item.id === user.id);
+  const student = students.find((item) =>
+    item.id === account?.studentId ||
+    item.userId === user.id ||
+    (item.email && item.email.toLowerCase() === String(user.email || '').toLowerCase())
+  );
+  return {
+    studentId: student?.studentId || student?.rollNumber || account?.studentId || user.id,
+    name: student?.fullName || student?.name || '',
+  };
+}
+
+function activeComputerLab(lab) {
+  return lab.active !== false;
+}
+
+function isComputerLabBooking(booking) {
+  return booking.active !== false && reservesComputer(booking);
+}
 
 function localDateKey(date) {
   const year = date.getFullYear();
@@ -749,6 +796,348 @@ app.get('/api/teacher/timetable', authenticate, requireRole('teacher'), async (r
 app.get('/api/student/dashboard', authenticate, requireRole('student'), handleAsync(getDashboard));
 
 app.post('/api/student/lab-requests', authenticate, requireRole('student'), handleAsync(createLabRequest));
+
+app.get('/api/student/computer-labs', authenticate, requireRole('student'), handleAsync(async (req, res) => {
+  const hasTimeFilter = ['date', 'startTime', 'endTime'].some((key) => req.query[key] !== undefined);
+  let slot = null;
+  if (hasTimeFilter) {
+    const validation = validateComputerLabTime(req.query);
+    if (validation.error) return res.status(400).json({ message: validation.error });
+    slot = validation.value;
+  }
+  const [laboratories, bookings, profile] = await Promise.all([
+    db.read('laboratories.json'),
+    db.read('lab_bookings.json'),
+    getComputerLabStudent(req.user),
+  ]);
+  const labs = laboratories.filter(activeComputerLab).map((lab) => {
+    const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
+    return {
+      ...lab,
+      category: lab.category || lab.type || 'LPC',
+      computers: computers.filter((computer) => computer.active !== false).map((computer) => {
+        const reservation = slot && bookings.find((booking) =>
+          isComputerLabBooking(booking) &&
+          booking.labId === lab.id &&
+          booking.computerId === computer.id &&
+          computerLabOverlaps(booking, slot)
+        );
+        return { ...computer, availability: slot ? (reservation ? 'occupied' : 'available') : 'unknown' };
+      }),
+    };
+  });
+  res.json({ labs, profile });
+}));
+
+app.get('/api/student/computer-lab-requests', authenticate, requireRole('student'), handleAsync(async (req, res) => {
+  const [bookings, laboratories] = await Promise.all([
+    db.read('lab_bookings.json'),
+    db.read('laboratories.json'),
+  ]);
+  const labNames = new Map(laboratories.map((lab) => [lab.id, lab.name]));
+  const records = bookings
+    .filter((booking) => booking.userId === req.user.id)
+    .map((booking) => ({ ...booking, labName: booking.labName || labNames.get(booking.labId) || 'Computer lab' }))
+    .sort((first, second) => String(second.createdAt || '').localeCompare(String(first.createdAt || '')));
+  res.json({ requests: records });
+}));
+
+app.post('/api/student/computer-lab-bookings', authenticate, requireRole('student'), handleAsync(async (req, res) => {
+  const { labId, computerId } = req.body || {};
+  const validation = validateComputerLabTime(req.body);
+  if (validation.error) return res.status(400).json({ message: validation.error });
+  if (typeof labId !== 'string' || !labId.trim() || typeof computerId !== 'string' || !computerId.trim()) {
+    return res.status(400).json({ message: 'Choose a laboratory and an available computer.' });
+  }
+  const [laboratories, profile] = await Promise.all([
+    db.read('laboratories.json'),
+    getComputerLabStudent(req.user),
+  ]);
+  const lab = laboratories.find((item) => item.id === labId && activeComputerLab(item));
+  if (!lab) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  if ((lab.category || lab.type || 'LPC') !== 'LPC') {
+    return res.status(400).json({ message: 'High Performance Computing Lab bookings must be submitted as a request.' });
+  }
+  const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
+  const computer = computers.find((item) => item.id === computerId && item.active !== false);
+  if (!computer) return res.status(404).json({ message: 'Computer not found in this laboratory.' });
+  const reservation = {
+    labId: lab.id,
+    labName: lab.name || 'Computer laboratory',
+    category: 'LPC',
+    computerId: computer.id,
+    computerName: computer.name || computer.label || 'Computer',
+    userId: req.user.id,
+    studentId: profile.studentId,
+    studentName: profile.name,
+    ...validation.value,
+    status: 'confirmed',
+    createdAt: new Date().toISOString(),
+  };
+  const result = await db.addIf(
+    'lab_bookings.json',
+    reservation,
+    (existing) => isComputerLabBooking(existing) && reservationConflicts(existing, reservation),
+  );
+  if (!result.inserted) return res.status(409).json({ message: 'That computer has already been booked for an overlapping time. Check availability again.' });
+  res.status(201).json({ booking: result.record });
+}));
+
+app.post('/api/student/computer-lab-requests', authenticate, requireRole('student'), handleAsync(async (req, res) => {
+  const { labId, studentId, name, purpose } = req.body || {};
+  const validation = validateComputerLabTime(req.body);
+  if (validation.error) return res.status(400).json({ message: validation.error });
+  if (
+    typeof labId !== 'string' || !labId.trim() ||
+    typeof studentId !== 'string' || !studentId.trim() || studentId.length > 120 ||
+    typeof name !== 'string' || !name.trim() || name.trim().length > 120 ||
+    typeof purpose !== 'string' || !purpose.trim() || purpose.trim().length > 500
+  ) {
+    return res.status(400).json({ message: 'Student ID, name, laboratory, date, start and end times, and purpose are required.' });
+  }
+  const [laboratories, profile] = await Promise.all([
+    db.read('laboratories.json'),
+    getComputerLabStudent(req.user),
+  ]);
+  if (profile.studentId && studentId.trim() !== profile.studentId) {
+    return res.status(403).json({ message: 'Student ID must match your CampusSpace profile.' });
+  }
+  if (profile.name && name.trim().toLowerCase() !== profile.name.trim().toLowerCase()) {
+    return res.status(403).json({ message: 'Name must match your CampusSpace profile.' });
+  }
+  const lab = laboratories.find((item) => item.id === labId && activeComputerLab(item));
+  if (!lab) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  if ((lab.category || lab.type) !== 'HPC') {
+    return res.status(400).json({ message: 'Choose a High Performance Computing Lab for an approval request.' });
+  }
+  const request = await db.add('lab_bookings.json', {
+    labId: lab.id,
+    labName: lab.name || 'Computer laboratory',
+    category: 'HPC',
+    userId: req.user.id,
+    studentId: profile.studentId || studentId.trim(),
+    studentName: profile.name || name.trim(),
+    ...validation.value,
+    purpose: purpose.trim(),
+    status: 'pending',
+    sentTo: 'Lab Head/Admin',
+    createdAt: new Date().toISOString(),
+  });
+  res.status(201).json({ request });
+}));
+
+app.get('/api/admin/computer-labs', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const hasTimeFilter = ['date', 'startTime', 'endTime'].some((key) => req.query[key] !== undefined);
+  let slot = null;
+  if (hasTimeFilter) {
+    const validation = validateComputerLabTime(req.query);
+    if (validation.error) return res.status(400).json({ message: validation.error });
+    slot = validation.value;
+  }
+  const [laboratories, bookings] = await Promise.all([
+    db.read('laboratories.json'),
+    db.read('lab_bookings.json'),
+  ]);
+  const labs = laboratories.map((lab) => {
+    const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
+    const activeComputers = computers.filter((computer) => computer.active !== false).map((computer) => {
+      const reservation = slot && bookings.find((booking) =>
+        isComputerLabBooking(booking) &&
+        booking.labId === lab.id &&
+        booking.computerId === computer.id &&
+        computerLabOverlaps(booking, slot)
+      );
+      return { ...computer, availability: slot ? (reservation ? 'occupied' : 'available') : 'unknown' };
+    });
+    const occupied = activeComputers.filter((computer) => computer.availability === 'occupied').length;
+    return {
+      ...lab,
+      category: lab.category || lab.type || 'LPC',
+      computers: activeComputers,
+      utilization: slot ? { occupied, available: activeComputers.length - occupied, total: activeComputers.length } : null,
+    };
+  });
+  const labNames = new Map(laboratories.map((lab) => [lab.id, lab.name]));
+  const requests = bookings
+    .filter((booking) => booking.category === 'HPC')
+    .map((booking) => ({ ...booking, labName: booking.labName || labNames.get(booking.labId) || 'Computer lab' }))
+    .sort((first, second) => String(second.createdAt || '').localeCompare(String(first.createdAt || '')));
+  res.json({ labs, requests });
+}));
+
+app.post('/api/admin/computer-labs', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const { name, category, building, room, description } = req.body || {};
+  if (
+    typeof name !== 'string' || !name.trim() || name.trim().length > 120 ||
+    !['LPC', 'HPC'].includes(category) ||
+    typeof building !== 'string' || !building.trim() || building.trim().length > 120 ||
+    (room !== undefined && (typeof room !== 'string' || room.length > 80)) ||
+    (description !== undefined && (typeof description !== 'string' || description.length > 500))
+  ) {
+    return res.status(400).json({ message: 'Enter a lab name, LPC/HPC category, and building. Optional details must be within the allowed length.' });
+  }
+  const laboratory = await db.add('laboratories.json', {
+    name: name.trim(),
+    category,
+    building: building.trim(),
+    room: String(room || '').trim(),
+    description: String(description || '').trim(),
+    computers: [],
+    active: true,
+    createdAt: new Date().toISOString(),
+  });
+  res.status(201).json({ lab: laboratory });
+}));
+
+app.put('/api/admin/computer-labs/:id', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const { name, category, building, room, description } = req.body || {};
+  if (
+    typeof name !== 'string' || !name.trim() || name.trim().length > 120 ||
+    !['LPC', 'HPC'].includes(category) ||
+    typeof building !== 'string' || !building.trim() || building.trim().length > 120 ||
+    (room !== undefined && (typeof room !== 'string' || room.length > 80)) ||
+    (description !== undefined && (typeof description !== 'string' || description.length > 500))
+  ) {
+    return res.status(400).json({ message: 'Enter a lab name, LPC/HPC category, and building. Optional details must be within the allowed length.' });
+  }
+  const laboratory = await db.getById('laboratories.json', req.params.id);
+  if (!laboratory) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  if (category !== (laboratory.category || laboratory.type || 'LPC')) {
+    const bookings = await db.read('lab_bookings.json');
+    if (bookings.some((booking) => booking.labId === laboratory.id && booking.status !== 'rejected')) {
+      return res.status(409).json({ message: 'The lab category cannot change while it has booking history.' });
+    }
+  }
+  const updated = await db.update('laboratories.json', laboratory.id, {
+    name: name.trim(),
+    category,
+    building: building.trim(),
+    room: String(room || '').trim(),
+    description: String(description || '').trim(),
+    updatedAt: new Date().toISOString(),
+  });
+  res.json({ lab: updated });
+}));
+
+app.delete('/api/admin/computer-labs/:id', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const laboratory = await db.getById('laboratories.json', req.params.id);
+  if (!laboratory) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  const bookings = await db.read('lab_bookings.json');
+  const today = localDateKey(new Date());
+  const hasUpcomingActivity = bookings.some((booking) =>
+    booking.labId === laboratory.id && booking.date >= today &&
+    (isComputerLabBooking(booking) || String(booking.status).toLowerCase() === 'pending')
+  );
+  if (hasUpcomingActivity) return res.status(409).json({ message: 'Resolve pending requests and future reservations before removing this lab.' });
+  await db.update('laboratories.json', laboratory.id, { active: false, deletedAt: new Date().toISOString() });
+  res.json({ message: 'Laboratory removed.' });
+}));
+
+app.post('/api/admin/computer-labs/:id/computers', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const { name } = req.body || {};
+  if (typeof name !== 'string' || !name.trim() || name.trim().length > 80) {
+    return res.status(400).json({ message: 'Enter a computer name up to 80 characters.' });
+  }
+  const lab = await db.getById('laboratories.json', req.params.id);
+  if (!lab || !activeComputerLab(lab)) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  const computer = { id: db.generateId(), name: name.trim(), active: true };
+  const updated = await db.mutate('laboratories.json', (laboratories) => {
+    const current = laboratories.find((item) => item.id === lab.id);
+    if (!current || !activeComputerLab(current)) return { changed: false, value: null };
+    const computers = Array.isArray(current.computers) ? current.computers : Array.isArray(current.pcs) ? current.pcs : [];
+    if (computers.some((item) => item.active !== false && item.name.toLowerCase() === computer.name.toLowerCase())) {
+      return { changed: false, value: { duplicate: true } };
+    }
+    current.computers = [...computers, computer];
+    delete current.pcs;
+    return { changed: true, value: current };
+  });
+  if (!updated) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  if (updated.duplicate) return res.status(409).json({ message: 'A computer with that name already exists in this laboratory.' });
+  res.status(201).json({ computer, lab: updated });
+}));
+
+app.delete('/api/admin/computer-labs/:id/computers/:computerId', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const lab = await db.getById('laboratories.json', req.params.id);
+  if (!lab) return res.status(404).json({ message: 'Computer laboratory not found.' });
+  const computer = (Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [])
+    .find((item) => item.id === req.params.computerId && item.active !== false);
+  if (!computer) return res.status(404).json({ message: 'Computer not found.' });
+  const bookings = await db.read('lab_bookings.json');
+  const today = localDateKey(new Date());
+  if (bookings.some((booking) => booking.labId === lab.id && booking.computerId === computer.id &&
+      booking.date >= today && isComputerLabBooking(booking))) {
+    return res.status(409).json({ message: 'This computer has a future reservation and cannot be removed yet.' });
+  }
+  const updated = await db.mutate('laboratories.json', (laboratories) => {
+    const current = laboratories.find((item) => item.id === lab.id);
+    const computers = current && (Array.isArray(current.computers) ? current.computers : Array.isArray(current.pcs) ? current.pcs : []);
+    const index = computers ? computers.findIndex((item) => item.id === computer.id && item.active !== false) : -1;
+    if (index < 0) return { changed: false, value: null };
+    computers[index] = { ...computers[index], active: false };
+    current.computers = computers;
+    delete current.pcs;
+    return { changed: true, value: current };
+  });
+  if (!updated) return res.status(404).json({ message: 'Computer not found.' });
+  res.json({ lab: updated });
+}));
+
+app.post('/api/admin/computer-lab-requests/:id/decision', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const { decision, computerId } = req.body || {};
+  if (!['approved', 'rejected'].includes(decision)) {
+    return res.status(400).json({ message: 'Choose approve or reject.' });
+  }
+  const request = await db.getById('lab_bookings.json', req.params.id);
+  if (!request || request.category !== 'HPC') return res.status(404).json({ message: 'High Performance Lab request not found.' });
+  if (String(request.status).toLowerCase() !== 'pending') {
+    return res.status(409).json({ message: 'This request has already been reviewed.' });
+  }
+  if (decision === 'rejected') {
+    const result = await db.mutate('lab_bookings.json', (bookings) => {
+      const current = bookings.find((booking) => booking.id === request.id);
+      if (!current || String(current.status).toLowerCase() !== 'pending') {
+        return { changed: false, value: { error: 'This request has already been reviewed.' } };
+      }
+      Object.assign(current, { status: 'rejected', reviewedBy: req.user.id, reviewedAt: new Date().toISOString() });
+      return { changed: true, value: { request: current } };
+    });
+    if (result.error) return res.status(409).json({ message: result.error });
+    return res.json({ request: result.request });
+  }
+  const timeValidation = validateComputerLabTime(request);
+  if (timeValidation.error) return res.status(409).json({ message: 'The requested time has passed and cannot be approved.' });
+  const lab = await db.getById('laboratories.json', request.labId);
+  if (!lab || !activeComputerLab(lab)) return res.status(409).json({ message: 'This laboratory is no longer active.' });
+  const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
+  const specifiedComputer = computerId ? computers.find((item) => item.id === computerId && item.active !== false) : null;
+  if (computerId && !specifiedComputer) return res.status(400).json({ message: 'Choose an active computer in this laboratory.' });
+  const result = await db.mutate('lab_bookings.json', (bookings) => {
+    const current = bookings.find((booking) => booking.id === request.id);
+    if (!current || String(current.status).toLowerCase() !== 'pending') {
+      return { changed: false, value: { error: 'This request has already been reviewed.' } };
+    }
+    const availableComputer = (specifiedComputer ? [specifiedComputer] : computers.filter((item) => item.active !== false))
+      .find((computer) => !bookings.some((booking) =>
+        booking.id !== current.id &&
+        isComputerLabBooking(booking) &&
+        reservationConflicts(booking, { ...current, computerId: computer.id })
+      ));
+    if (!availableComputer) {
+      return { changed: false, value: { error: 'No computer is available for this request time.', conflict: true } };
+    }
+    Object.assign(current, {
+      status: 'approved',
+      computerId: availableComputer.id,
+      computerName: availableComputer.name || availableComputer.label || 'Computer',
+      reviewedBy: req.user.id,
+      reviewedAt: new Date().toISOString(),
+    });
+    return { changed: true, value: { request: current } };
+  });
+  if (result.error) return res.status(409).json({ message: result.error });
+  res.json({ request: result.request });
+}));
 
 app.patch('/api/student/notifications/:id', authenticate, requireRole('student'), handleAsync(markNotificationRead));
 

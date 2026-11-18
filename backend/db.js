@@ -102,6 +102,16 @@ async function addIf(fileName, record, conflictsWith) {
   });
 }
 
+async function mutate(fileName, operation) {
+  return queueWrite(fileName, async () => {
+    const data = await read(fileName);
+    if (!Array.isArray(data)) throw new Error(`${fileName} is not an array`);
+    const outcome = operation(data);
+    if (outcome.changed) await write(fileName, data);
+    return outcome.value;
+  });
+}
+
 /** Update an existing record by id */
 async function update(fileName, id, patch) {
   return queueWrite(fileName, async () => {
@@ -145,6 +155,7 @@ export default {
   write,
   add,
   addIf,
+  mutate,
   update,
   delete: del,
   getById,

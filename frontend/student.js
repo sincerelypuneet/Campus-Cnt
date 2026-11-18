@@ -228,27 +228,19 @@
   }
 
   function labsView() {
-    const labs = data.labs.map((lab) => `<article class="info-card"><div class="section-title-row"><h3>${escapeHtml(lab.name || 'Computer lab')}</h3><span class="status status--neutral">Check availability</span></div>
+    const labs = data.labs.map((lab) => `<article class="info-card"><div class="section-title-row"><h3>${escapeHtml(lab.name || 'Computer lab')}</h3><span class="status status--neutral">Open booking system</span></div>
       <p>${escapeHtml([lab.building, lab.floor, lab.room].filter(Boolean).join(' · ') || 'Location not listed')}</p>
-      <p>${escapeHtml([...(lab.equipment || lab.resources || []), lab.capacity && `${lab.capacity} seats`].filter(Boolean).join(' · ') || 'Equipment details not listed')}</p></article>`).join('');
-    return `${pageHeading('Computer Labs', 'Explore campus computer labs. Lab capacity and live workstation availability are not provided in the current campus records.')}
+      <p>${escapeHtml([...(lab.equipment || lab.resources || []), lab.capacity && `${lab.capacity} seats`].filter(Boolean).join(' · ') || 'Computer laboratory')}</p></article>`).join('');
+    return `${pageHeading('Computer Labs', 'Reserve an LPC computer or submit an HPC booking request for approval.', '<a class="button button--primary" href="computer-labs.html">Open lab booking system</a>')}
       <section class="card-grid">${labs || emptyState('No computer labs listed', 'Lab information will appear here when campus records are available.')}</section>
-      <section class="panel detail-panel"><div class="section-title-row"><div><h2>Request lab access</h2><p class="panel-subtitle">Your request is sent to the campus team for review.</p></div></div>
-        <form class="request-form" id="lab-request-form">
-          <label class="form-field"><span class="field-label">Computer lab</span><select class="select" name="labId" required>${data.labs.map((lab) => `<option value="${escapeHtml(lab.id)}">${escapeHtml(lab.name || 'Computer lab')}</option>`).join('')}</select></label>
-          <label class="form-field"><span class="field-label">Date</span><input class="input" name="date" type="date" min="${localDateKey(new Date())}" required /></label>
-          <label class="form-field"><span class="field-label">Start time</span><input class="input" name="startTime" type="time" required /></label>
-          <label class="form-field"><span class="field-label">End time</span><input class="input" name="endTime" type="time" required /></label>
-          <label class="form-field form-field--wide"><span class="field-label">What will you work on?</span><textarea class="textarea" name="purpose" maxlength="500" required></textarea></label>
-          <div class="form-field form-field--wide"><button class="button button--primary" type="submit" ${data.labs.length ? '' : 'disabled'}>Send request</button></div>
-        </form></section>`;
+      <section class="panel detail-panel"><div class="section-title-row"><div><h2>Track computer lab requests</h2><p class="panel-subtitle">View HPC decisions and confirmed LPC reservations.</p></div><a class="button button--quiet" href="computer-labs.html#my-requests">My lab requests</a></div></section>`;
   }
 
   function requestsView() {
     const rows = data.requests.map((item) => `<div class="timetable-item"><div><strong>${escapeHtml(item.labName || 'Computer lab request')} · ${escapeHtml(item.purpose || 'Purpose not listed')}</strong><small>${escapeHtml(displayDate(item.date))}${item.timeSlot ? ` · ${escapeHtml(item.timeSlot)}` : ''}</small></div><span class="status ${String(item.status).toLowerCase() === 'rejected' ? 'status--busy' : 'status--neutral'}">${escapeHtml(item.status || 'Pending')}</span></div>`).join('');
     return `${pageHeading('My Lab Requests', 'Track requests submitted using your campus account.')}
       <section class="panel">${rows || emptyState('No lab requests yet', 'When you request lab access, its status will show up here.')}</section>
-      <p class="muted" style="font-size:11px">Need to make a request? Go to <button class="text-button" data-go="labs">Computer Labs</button>.</p>`;
+      <p class="muted" style="font-size:11px">For PC bookings and current request statuses, <a href="computer-labs.html#my-requests">open the computer lab booking system</a>.</p>`;
   }
 
   function notificationsView() {
