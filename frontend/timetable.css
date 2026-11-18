@@ -1,3 +1,21 @@
+.management-field {
+  display: grid;
+  max-width: 260px;
+  gap: 0.4rem;
+  color: #53647a;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+.management-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #dfe7f1;
+  border-radius: 8px;
+  color: #26364a;
+  background: #fff;
+  font: inherit;
+}
 .toolbar {
   margin: 0 0 1rem;
   display: flex;
@@ -5,55 +23,98 @@
   gap: 10px;
 }
 .toolbar select {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  min-height: 40px;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #dfe7f1;
+  border-radius: 8px;
+  background: #fff;
 }
-
 .timetable-grid {
   width: 100%;
-  border-collapse: collapse;
-  background: var(--primary-white);
+  min-width: 850px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
 }
 .timetable-grid th, .timetable-grid td {
-  border: 1px solid #d0d0d0;
-  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #edf1f6;
+  padding: 0.85rem 0.9rem;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
 }
 .timetable-grid th {
-  background: var(--primary-light-blue);
+  color: #506078;
+  background: #f0f6fd;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .timetable-grid tbody tr:hover {
-  background: #f5faff;
+  background: #f8fbff;
+}
+.timetable-grid tbody tr:last-child td {
+  border-bottom: 0;
 }
 .timetable-actions {
   white-space: nowrap;
 }
 .timetable-actions button {
-  margin-right: 0.35rem;
+  min-height: 32px;
+  margin-right: 0.3rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 7px;
+  font-size: 0.76rem;
+}
+.timetable-actions button[data-action="delete"] {
+  color: #a0444b;
+  background: #fff0f0;
+}
+.timetable-actions button[data-action="delete"]:hover {
+  color: #fff;
+  background: #a0444b;
+}
+.table-scroll {
+  overflow: auto;
+  border: 1px solid #e7edf5;
+  border-radius: 11px;
+}
+#entry-modal .modal-content {
+  width: min(100%, 920px);
 }
 #entry-form label {
-  display: block;
-  margin-bottom: 0.8rem;
-  font-size: 0.9rem;
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  color: #53647a;
+  font-size: 0.82rem;
+  font-weight: 650;
 }
 #entry-form input,
 #entry-form select {
   width: 100%;
-  padding: 0.4rem 0.6rem;
-  margin-top: 0.2rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  min-height: 42px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #dfe7f1;
+  border-radius: 8px;
+  color: #26364a;
+  background: #fff;
+  font: inherit;
 }
-.table-scroll {
-  overflow-x: auto;
+#entry-form > button[type="submit"] {
+  justify-self: start;
+  min-height: 42px;
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
 }
 .form-error {
-  margin: 0.75rem 0;
-  color: #b42318;
+  margin: 0.6rem 0 1rem;
+  color: #a0444b;
 }
 .form-success {
-  margin: 0.75rem 0;
-  color: #18794e;
+  margin: 0.6rem 0 1rem;
+  color: #23876c;
+}
+@media (max-width: 560px) {
+  #entry-modal .modal-content form { grid-template-columns: 1fr; }
+  .management-field { max-width: none; }
 }

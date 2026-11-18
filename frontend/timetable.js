@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       status = document.createElement('p');
       status.id = 'timetable-status';
       status.setAttribute('role', 'status');
-      document.querySelector('#timetable-section .toolbar').after(status);
+      document.querySelector('#timetable-section .management-overview-grid').after(status);
     }
     status.className = isError ? 'form-error' : 'form-success';
     status.textContent = message;

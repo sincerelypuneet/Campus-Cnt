@@ -63,59 +63,86 @@
       </section>
       <section class="dashboard" id="teachers-section" hidden>
         <h1 class="section-title">Teacher Management</h1>
-        <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Search teachers by name or email..." />
-          <select id="dept-filter">
-            <option value="">All Departments</option>
-          </select>
-          <button id="search-btn" class="action-btn"><i class="fas fa-search"></i> Search</button>
+        <p class="management-intro">Create and maintain faculty profiles, and find teachers by name or department.</p>
+        <div class="management-overview-grid">
+          <section class="management-card">
+            <h2>Add a teacher</h2>
+            <p>Create a faculty profile with department, contact, and teaching details.</p>
+            <button id="add-teacher-btn" class="action-btn"><i class="fas fa-plus"></i> Add Teacher</button>
+          </section>
+          <section class="management-card">
+            <h2>Find and filter teachers</h2>
+            <p>Search the directory or narrow it to a department.</p>
+            <div class="search-bar">
+              <input type="text" id="search-input" aria-label="Search teachers" placeholder="Search by name or email..." />
+              <select id="dept-filter" aria-label="Filter by department">
+                <option value="">All Departments</option>
+              </select>
+              <button id="search-btn" class="action-btn"><i class="fas fa-search"></i> Search</button>
+            </div>
+          </section>
         </div>
-        <button id="add-teacher-btn" class="action-btn"><i class="fas fa-plus"></i> Add Teacher</button>
-        <div class="table-scroll">
-          <table class="teacher-table" id="teacher-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Designation</th>
-                <th>Subjects</th>
-                <th>Classrooms</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <section class="management-card management-table-card">
+          <h2>Teacher directory</h2>
+          <div class="table-scroll">
+            <table class="teacher-table" id="teacher-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Designation</th>
+                  <th>Subjects</th>
+                  <th>Classrooms</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
       <section class="dashboard" id="timetable-section" hidden>
         <h1 class="section-title">Timetable Management</h1>
-        <div class="toolbar">
-          <button id="add-entry" class="action-btn"><i class="fas fa-plus"></i> Add Entry</button>
-          <label for="view-mode">View</label>
-          <select id="view-mode">
-            <option value="weekly">Weekly View</option>
-            <option value="daily">Today</option>
-          </select>
+        <p class="management-intro">Create and update class schedules, and review the weekly or daily timetable.</p>
+        <div class="management-overview-grid">
+          <section class="management-card">
+            <h2>Add a timetable entry</h2>
+            <p>Schedule a teacher, subject, classroom, and time slot.</p>
+            <button id="add-entry" class="action-btn"><i class="fas fa-plus"></i> Add Entry</button>
+          </section>
+          <section class="management-card">
+            <h2>Timetable view</h2>
+            <p>Switch between the full schedule and today's classes.</p>
+            <label class="management-field" for="view-mode">View
+              <select id="view-mode">
+                <option value="weekly">Weekly View</option>
+                <option value="daily">Today</option>
+              </select>
+            </label>
+          </section>
         </div>
-        <div class="table-scroll">
-          <table class="timetable-grid" id="timetable-container">
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Time</th>
-                <th>Subject</th>
-                <th>Teacher</th>
-                <th>Class</th>
-                <th>Room</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <section class="management-card management-table-card">
+          <h2>Class schedule</h2>
+          <div class="table-scroll">
+            <table class="timetable-grid" id="timetable-container">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Time</th>
+                  <th>Subject</th>
+                  <th>Teacher</th>
+                  <th>Class</th>
+                  <th>Room</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
       <section class="dashboard" id="labs-section" hidden>

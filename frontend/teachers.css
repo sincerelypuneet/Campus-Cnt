@@ -1,62 +1,120 @@
-/* teachers.css */
-/* Extends admin.css for the Teacher Management page */
-
-/* Search bar */
+.management-intro {
+  margin: -0.5rem 0 1.1rem;
+  color: #64758a;
+  font-size: 0.95rem;
+}
+.management-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.management-card {
+  min-width: 0;
+  padding: 1.35rem;
+  border: 1px solid #e3ebf5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgba(31, 54, 80, 0.06);
+}
+.management-card h2 {
+  margin: 0 0 0.45rem;
+  color: #1a2b3c;
+  font-size: 1.15rem;
+}
+.management-card > p {
+  margin: 0 0 1rem;
+  color: #758398;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.management-card .action-btn {
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+}
+.management-table-card {
+  padding-bottom: 1rem;
+}
 .search-bar {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(170px, 0.8fr) auto;
+  gap: 0.65rem;
+  margin: 0;
+  align-items: center;
 }
-.search-bar input {
-  flex: 1 1 200px;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+.search-bar input,
 .search-bar select {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  min-height: 42px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #dfe7f1;
+  border-radius: 8px;
+  background: #fff;
+  color: #26364a;
+  font-size: 0.88rem;
+}
+.search-bar input:focus,
+.search-bar select:focus {
+  border-color: #4a90e2;
+  outline: 3px solid rgba(74, 144, 226, 0.15);
+}
+.management-table-card .table-scroll {
+  overflow: auto;
+  border: 1px solid #e7edf5;
+  border-radius: 11px;
 }
 
-/* Teacher table */
+.search-bar {
+  margin-top: 0.8rem;
+}
 .teacher-table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  background: var(--primary-white);
+  min-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
 }
 .teacher-table th,
 .teacher-table td {
-  padding: 0.6rem 0.8rem;
-  border: 1px solid #e0e0e0;
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid #edf1f6;
   text-align: left;
+  font-size: 0.84rem;
 }
 .teacher-table th {
-  background: var(--primary-light-blue);
+  color: #506078;
+  background: #f0f6fd;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
-.teacher-table tr:hover {
-  background: #f5faff;
+.teacher-table tbody tr:hover {
+  background: #f8fbff;
+}
+.teacher-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 .action-icons {
+  min-width: 34px;
+  min-height: 32px;
   border: 0;
-  border-radius: 5px;
-  color: white;
+  border-radius: 7px;
+  color: #fff;
   cursor: pointer;
-  margin-right: 0.35rem;
-  padding: 0.45rem 0.6rem;
+  margin-right: 0.3rem;
+  padding: 0.45rem 0.55rem;
 }
 .action-icons.edit {
-  background: #1683e8;
+  background: #4a90e2;
 }
 .action-icons.deactivate {
-  background: #e83d4b;
+  background: #cf5962;
 }
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
+  padding: 0.32rem 0.65rem;
   border-radius: 999px;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -72,7 +130,6 @@
   white-space: nowrap;
 }
 
-/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -82,35 +139,71 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  padding: 2rem 1rem;
+  background-color: rgba(23, 38, 57, 0.48);
 }
 .modal-content {
+  width: min(100%, 760px);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  margin: 0 auto;
+  padding: 1.7rem;
+  border: 1px solid #e3ebf5;
+  border-radius: 16px;
   background-color: #fff;
-  margin: 5% auto;
-  padding: 1.5rem;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(20, 38, 60, 0.2);
   position: relative;
+}
+.modal-content h2 {
+  margin: 0 2rem 1.2rem 0;
+  color: #1a2b3c;
+  font-size: 1.3rem;
 }
 .close {
   position: absolute;
-  right: 1rem;
-  top: 0.5rem;
-  font-size: 1.5rem;
+  right: 1.15rem;
+  top: 0.85rem;
+  border: 0;
+  background: transparent;
+  font-size: 1.7rem;
   cursor: pointer;
   color: #999;
 }
+.modal-content form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
 .modal-content label {
-  display: block;
-  margin-bottom: 0.8rem;
-  font-size: 0.9rem;
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  color: #53647a;
+  font-size: 0.82rem;
+  font-weight: 650;
 }
 .modal-content input,
 .modal-content select {
   width: 100%;
-  padding: 0.4rem 0.6rem;
-  margin-top: 0.2rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  min-height: 42px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #dfe7f1;
+  border-radius: 8px;
+  color: #26364a;
+  background: #fff;
+  font: inherit;
+}
+.modal-content form > button[type="submit"] {
+  justify-self: start;
+  min-height: 42px;
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+}
+@media (max-width: 800px) {
+  .management-overview-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .search-bar { grid-template-columns: 1fr; }
+  .modal-content { padding: 1.3rem 1rem; }
+  .modal-content form { grid-template-columns: 1fr; }
 }
