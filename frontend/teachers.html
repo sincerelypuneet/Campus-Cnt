@@ -14,7 +14,7 @@
 </head>
 <body>
   <div class="wrapper">
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" aria-label="Admin navigation">
       <div class="sidebar-header"><h2>CampusSpace</h2></div>
       <ul class="nav-list">
         <li><a href="admin.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -26,46 +26,48 @@
 
     <main class="content">
       <header class="topbar">
-        <button class="toggle-btn" id="toggle-sidebar"><i class="fas fa-bars"></i></button>
+        <button class="toggle-btn" id="toggle-sidebar" type="button" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="true"><i class="fas fa-bars" aria-hidden="true"></i></button>
         <div class="profile"><span id="user-email">admin@campusspace.local</span><img src="logo.svg" alt="Profile" class="avatar" /></div>
       </header>
 
       <section class="dashboard" style="padding:1.5rem;">
         <h1 class="section-title">Teacher Management</h1>
         <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Search teachers by name or email..." />
-          <select id="dept-filter">
+          <input type="search" id="search-input" aria-label="Search teachers" placeholder="Search teachers by name or email..." />
+          <select id="dept-filter" aria-label="Filter by department">
             <option value="">All Departments</option>
             <!-- options will be populated dynamically -->
           </select>
           <button id="search-btn" class="action-btn"><i class="fas fa-search"></i> Search</button>
         </div>
         <button id="add-teacher-btn" class="action-btn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Add Teacher</button>
+        <div class="table-scroll">
         <table class="teacher-table" id="teacher-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Department</th>
-              <th>Designation</th>
-              <th>Subjects</th>
-              <th>Classrooms</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Department</th>
+              <th scope="col">Designation</th>
+              <th scope="col">Subjects</th>
+              <th scope="col">Classrooms</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
             <!-- rows injected by JS -->
           </tbody>
         </table>
+        </div>
       </section>
     </main>
   </div>
 
   <!-- Modal for add / edit -->
-  <div class="modal" id="teacher-modal">
-    <div class="modal-content">
-      <span class="close" id="modal-close">&times;</span>
+  <div class="modal" id="teacher-modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+      <button type="button" class="close" id="modal-close" aria-label="Close dialog">&times;</button>
       <h2 id="modal-title">Add Teacher</h2>
       <form id="teacher-form">
         <label>Full Name<input type="text" name="fullName" required /></label>

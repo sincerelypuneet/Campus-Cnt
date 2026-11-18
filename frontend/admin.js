@@ -8,11 +8,80 @@ document.addEventListener('DOMContentLoaded', () => {
     placeholder: document.getElementById('placeholder-section'),
   };
   const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('toggle-sidebar');
+  let mobileNavigation = window.matchMedia('(max-width: 768px)').matches;
+  const modalFocusSelector = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+
+  document.querySelectorAll('.modal').forEach(modal => {
+    let returnFocus = null;
+    const dialog = modal.querySelector('[role="dialog"]');
+    const observer = new MutationObserver(() => {
+      if (modal.getAttribute('aria-hidden') === 'false') {
+        if (modal.dataset.keyboardOpen) return;
+        returnFocus = document.activeElement;
+        modal.dataset.keyboardOpen = 'true';
+        const firstField = dialog && dialog.querySelector('input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
+        (firstField || dialog).focus();
+      } else if (modal.dataset.keyboardOpen) {
+        delete modal.dataset.keyboardOpen;
+        if (returnFocus && returnFocus.isConnected && !returnFocus.closest('[hidden]')) {
+          returnFocus.focus();
+        } else {
+          const fallback = modal.id === 'teacher-modal'
+            ? document.getElementById('add-teacher-btn')
+            : document.getElementById('add-entry');
+          if (fallback) fallback.focus();
+        }
+      }
+    });
+    observer.observe(modal, { attributes: true, attributeFilter: ['aria-hidden'] });
+
+    modal.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        const closeButton = modal.querySelector('.close');
+        if (closeButton) closeButton.click();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(modal.querySelectorAll(modalFocusSelector))
+        .filter(element => element.offsetParent !== null);
+      if (!focusable.length) {
+        event.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  });
+
+  function setNavigationCollapsed(collapsed) {
+    sidebar.classList.toggle('collapsed', collapsed);
+    sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+  }
+
+  if (mobileNavigation) setNavigationCollapsed(true);
+
+  window.addEventListener('resize', () => {
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile !== mobileNavigation) {
+      mobileNavigation = isMobile;
+      setNavigationCollapsed(isMobile);
+    }
+  });
 
   function showSection(name) {
     const section = sections[name] || sections.placeholder;
     Object.values(sections).forEach(item => {
-      item.hidden = item !== section;
+      if (item) item.hidden = item !== section;
     });
     navLinks.forEach(link => {
       const active = link.dataset.section === name;
@@ -26,15 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', event => {
       event.preventDefault();
       showSection(link.dataset.section);
-      sidebar.classList.remove('collapsed');
+      setNavigationCollapsed(mobileNavigation);
     });
   });
 
-  document.getElementById('toggle-sidebar').addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-  });
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', () => {
+      setNavigationCollapsed(!sidebar.classList.contains('collapsed'));
+    });
+  }
 
-  document.getElementById('logout').addEventListener('click', async event => {
+  const logout = document.getElementById('logout');
+  if (logout) logout.addEventListener('click', async event => {
     event.preventDefault();
     try {
       const response = await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
@@ -48,14 +120,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const teacherModal = document.getElementById('teacher-modal');
   const addTeacher = () => {
     showSection('teachers');
+    if (!teacherModal) return;
     teacherModal.style.display = 'block';
     teacherModal.setAttribute('aria-hidden', 'false');
   };
-  document.getElementById('add-teacher').addEventListener('click', addTeacher);
-  document.getElementById('add-teacher-btn').addEventListener('click', addTeacher);
+  [document.getElementById('add-teacher'), document.getElementById('add-teacher-btn')]
+    .filter(Boolean)
+    .forEach(button => button.addEventListener('click', addTeacher));
 
   const email = document.getElementById('user-email');
   const statsGrid = document.getElementById('stats-grid');
+  if (!statsGrid) return;
+  statsGrid.setAttribute('aria-busy', 'true');
   fetch('/api/admin/stats', { credentials: 'same-origin' })
     .then(async response => {
       const result = await response.json();
@@ -81,15 +157,29 @@ document.addEventListener('DOMContentLoaded', () => {
         card.append(value, caption);
         return card;
       }));
-      if (stats.email) email.textContent = stats.email;
+      statsGrid.setAttribute('aria-busy', 'false');
+      if (stats.email && email) email.textContent = stats.email;
       const list = document.getElementById('timetable-list');
-      list.replaceChildren(...(stats.todaysClasses || []).map(entry => {
+      const timetableItems = (stats.todaysClasses || []).map(entry => {
         const item = document.createElement('li');
         item.textContent = `${entry.startTime || ''} ${entry.subjectName || 'Scheduled class'}${entry.classroomNumber ? ` · Room ${entry.classroomNumber}` : ''}`;
         return item;
-      }));
+      });
+      if (timetableItems.length === 0) {
+        const emptyState = document.createElement('li');
+        emptyState.className = 'dashboard-state';
+        emptyState.textContent = 'No classes are scheduled for today.';
+        timetableItems.push(emptyState);
+      }
+      list.replaceChildren(...timetableItems);
     })
     .catch(error => {
       console.error('Unable to load admin dashboard:', error);
+      statsGrid.setAttribute('aria-busy', 'false');
+      const errorState = document.createElement('p');
+      errorState.className = 'dashboard-state dashboard-state--error';
+      errorState.setAttribute('role', 'alert');
+      errorState.textContent = 'Dashboard data could not be loaded. Please refresh to try again.';
+      statsGrid.replaceChildren(errorState);
     });
 });

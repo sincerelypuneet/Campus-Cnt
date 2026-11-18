@@ -16,7 +16,7 @@
 </head>
 <body>
   <div class="wrapper">
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" aria-label="Admin navigation">
       <div class="sidebar-header">
         <h2>CampusSpace</h2>
       </div>
@@ -38,7 +38,7 @@
 
     <main class="content" id="main-content">
       <header class="topbar">
-        <button class="toggle-btn" id="toggle-sidebar"><i class="fas fa-bars"></i></button>
+        <button class="toggle-btn" id="toggle-sidebar" type="button" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="true"><i class="fas fa-bars" aria-hidden="true"></i></button>
         <div class="profile">
           <span id="user-email">admin@campusspace.local</span>
           <img src="logo.svg" alt="Profile" class="avatar" />
@@ -48,8 +48,8 @@
       <!-- Dashboard Section -->
       <section class="dashboard" id="dashboard-section">
         <h1 class="section-title">Dashboard Overview</h1>
-        <div class="stats-grid" id="stats-grid">
-          <!-- Stats cards will be injected here -->
+        <div class="stats-grid" id="stats-grid" aria-live="polite" aria-busy="true">
+          <p class="dashboard-state" role="status">Loading campus statistics…</p>
         </div>
         <div class="today-timetable" id="today-timetable">
           <h2>Today's Timetable</h2>
@@ -190,7 +190,7 @@
       </section>
 
       <div class="modal" id="teacher-modal" aria-hidden="true">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="teacher-modal-title">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
           <button type="button" class="close" id="modal-close" aria-label="Close">&times;</button>
           <h2 id="modal-title">Add Teacher</h2>
           <form id="teacher-form">
@@ -209,7 +209,7 @@
       </div>
 
       <div class="modal" id="entry-modal" aria-hidden="true">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="entry-modal-title">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="entry-modal-title" tabindex="-1">
           <button type="button" class="close" id="entry-modal-close" aria-label="Close">&times;</button>
           <h2 id="entry-modal-title">Add Timetable Entry</h2>
           <form id="entry-form">
