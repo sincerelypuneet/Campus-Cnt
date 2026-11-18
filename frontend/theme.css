@@ -1,0 +1,166 @@
+.theme-toggle {
+  display: inline-flex;
+  min-height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #dfe4ed;
+  border-radius: 9px;
+  color: #4a5266;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.theme-toggle:hover {
+  border-color: #a9a2ff;
+}
+
+body > .theme-toggle {
+  position: fixed;
+  z-index: 1100;
+  top: 16px;
+  right: 18px;
+  box-shadow: 0 3px 12px #18203818;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body[data-theme="dark"] {
+  --primary-white: #1e293b;
+  --primary-light-blue: #0f172a;
+  --primary-dark-navy: #e2e8f0;
+  --sidebar-bg: #111827;
+  --ink: #e2e8f0;
+  --muted: #a3adc0;
+  --line: #334155;
+  --surface: #1e293b;
+  color: #e2e8f0;
+  background-color: #0f172a;
+}
+
+body[data-theme="dark"] .theme-toggle {
+  border-color: #475569;
+  color: #e2e8f0;
+  background: #1e293b;
+}
+
+body[data-theme="dark"] .container,
+body[data-theme="dark"] .card,
+body[data-theme="dark"] .login-card,
+body[data-theme="dark"] .finder-topbar,
+body[data-theme="dark"] .finder-panel,
+body[data-theme="dark"] .panel,
+body[data-theme="dark"] .classroom-card,
+body[data-theme="dark"] .teacher-result,
+body[data-theme="dark"] .empty-state,
+body[data-theme="dark"] .availability-summary,
+body[data-theme="dark"] .interval-chip,
+body[data-theme="dark"] .free-period,
+body[data-theme="dark"] .lab-card,
+body[data-theme="dark"] .category-switch,
+body[data-theme="dark"] .admin-lab-panel,
+body[data-theme="dark"] .admin-lab-card,
+body[data-theme="dark"] .stat-card,
+body[data-theme="dark"] .today-timetable,
+body[data-theme="dark"] .modal-content,
+body[data-theme="dark"] .management-card {
+  border-color: #334155;
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+body[data-theme="dark"] .login-screen {
+  background: radial-gradient(ellipse at 75% 15%, #28254a 0, transparent 40%), #0f172a;
+}
+
+body[data-theme="dark"] .topbar,
+body[data-theme="dark"] .lab-header {
+  border-color: #334155;
+  background-color: #111827;
+}
+
+body[data-theme="dark"] .form-field,
+body[data-theme="dark"] .brand,
+body[data-theme="dark"] .login-form label,
+body[data-theme="dark"] .availability-form label,
+body[data-theme="dark"] .request-form label,
+body[data-theme="dark"] .admin-lab-form label,
+body[data-theme="dark"] .admin-add-pc-form label,
+body[data-theme="dark"] .teacher-result-copy strong,
+body[data-theme="dark"] .profile-details dd,
+body[data-theme="dark"] .schedule-row strong,
+body[data-theme="dark"] .computer-row strong,
+body[data-theme="dark"] .request-row strong,
+body[data-theme="dark"] .intro h1,
+body[data-theme="dark"] .login-card h1 {
+  color: #e2e8f0;
+}
+
+body[data-theme="dark"] .subtitle,
+body[data-theme="dark"] .card p,
+body[data-theme="dark"] .description,
+body[data-theme="dark"] .demo-note,
+body[data-theme="dark"] .admin-lab-intro,
+body[data-theme="dark"] .admin-lab-muted,
+body[data-theme="dark"] .management-intro {
+  color: #a3adc0;
+}
+
+body[data-theme="dark"] input,
+body[data-theme="dark"] select,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] .search-control,
+body[data-theme="dark"] .room-time {
+  border-color: #475569;
+  color: #e2e8f0;
+  background-color: #0f172a;
+}
+
+body[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8;
+}
+
+body[data-theme="dark"] .button--quiet,
+body[data-theme="dark"] .demo-link {
+  border-color: #475569;
+  color: #c4bfff;
+  background-color: #1e293b;
+}
+
+body[data-theme="dark"] .button--quiet:hover,
+body[data-theme="dark"] .demo-link:hover {
+  background-color: #29364a;
+}
+
+body[data-theme="dark"] .teacher-result,
+body[data-theme="dark"] .admin-lab-card,
+body[data-theme="dark"] .profile-details div,
+body[data-theme="dark"] .computer-row,
+body[data-theme="dark"] .request-row,
+body[data-theme="dark"] .schedule-row,
+body[data-theme="dark"] .timetable-list li {
+  border-color: #334155;
+}
+
+body[data-theme="dark"] .room-time,
+body[data-theme="dark"] .status,
+body[data-theme="dark"] .state--neutral {
+  color: #cbd5e1;
+  background-color: #334155;
+}
+
+@media (max-width: 520px) {
+  .theme-toggle {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+}
