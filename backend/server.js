@@ -2,7 +2,7 @@
 
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from './db.js';
 import {
@@ -26,6 +26,19 @@ import {
   reservationConflicts,
   reservesComputer,
 } from './services/computerLabs.js';
+import {
+  isComputerUnderMaintenance,
+  isLabUnderMaintenance,
+  isClassroomUnderMaintenance,
+  validateMaintenanceInput,
+  getMaintenanceStatus,
+  maintenanceConflictsWithReservation,
+  maintenanceOverlapsWithExisting,
+} from './services/labMaintenance.js';
+import {
+  validateUnifiedSearch,
+  searchUnifiedResources,
+} from './services/unifiedSearch.js';
 import { getDashboard, createLabRequest, markNotificationRead } from './controllers/studentController.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -45,18 +58,52 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
+/** Health check endpoint */
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'CampusSpace API',
+  });
+});
+
 /** Helper: generate JWT */
 function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 /** Middleware: verify JWT and attach user */
-function authenticate(req, res, next) {
-  const token = req.cookies?.token;
+async function authenticate(req, res, next) {
+  let token = req.cookies?.token;
+  if (!token && typeof req.headers.authorization === 'string' && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.slice(7).trim();
+  }
   if (!token) return res.status(401).json({ message: 'Authentication required' });
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload; // { id, role, email }
+    if (!payload || !payload.id) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+    const users = await db.read('users.json');
+    const user = Array.isArray(users) ? users.find((u) => u && u.id === payload.id) : null;
+    if (!user || user.active === false) {
+      return res.status(401).json({ message: 'Account not found or deactivated' });
+    }
+    if (user.role === 'student') {
+      const students = await db.read('students.json');
+      const student = Array.isArray(students)
+        ? students.find(
+            (s) =>
+              s &&
+              (s.id === user.studentId ||
+                s.userId === user.id ||
+                (s.email && user.email && s.email.toLowerCase() === user.email.toLowerCase()))
+          )
+        : null;
+      if (student && student.active === false) {
+        return res.status(401).json({ message: 'Account not found or deactivated' });
+      }
+    }
+    req.user = { id: user.id, role: user.role, email: user.email };
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Invalid or expired token' });
@@ -77,7 +124,14 @@ function requireRole(...allowedRoles) {
 const handleAsync = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 function validateComputerLabTime(input) {
-  const { date, startTime, endTime } = input || {};
+  let { date, startTime, endTime, timeSlot } = input || {};
+  if ((!startTime || !endTime) && typeof timeSlot === 'string') {
+    const parts = timeSlot.split(/[-–]/).map(s => s.trim());
+    if (parts.length === 2) {
+      startTime = parts[0];
+      endTime = parts[1];
+    }
+  }
   const start = computerLabMinuteOfDay(startTime);
   const end = computerLabMinuteOfDay(endTime);
   const now = new Date();
@@ -228,22 +282,54 @@ function intervalsBetweenClasses(schedule) {
 
 /** Login endpoint */
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { email, password } = req.body || {};
+  if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
   const users = await db.read('users.json');
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (!user) {
+  if (!Array.isArray(users)) {
+    return res.status(500).json({ message: 'User database unavailable' });
+  }
+  const cleanEmail = email.trim().toLowerCase();
+  const user = users.find(u => u && typeof u.email === 'string' && u.email.toLowerCase() === cleanEmail);
+  if (!user || typeof user.passwordHash !== 'string' || !user.passwordHash) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
-  const match = await bcrypt.compare(password, user.passwordHash);
+  if (user.active === false) {
+    return res.status(403).json({ message: 'Account is deactivated' });
+  }
+  if (user.role === 'student') {
+    const students = await db.read('students.json');
+    if (Array.isArray(students)) {
+      const student = students.find(
+        (s) =>
+          s &&
+          (s.id === user.studentId ||
+            s.userId === user.id ||
+            (s.email && s.email.toLowerCase() === cleanEmail))
+      );
+      if (student && student.active === false) {
+        return res.status(403).json({ message: 'Account is deactivated' });
+      }
+    }
+  }
+  let match = false;
+  try {
+    match = await bcrypt.compare(password, user.passwordHash);
+  } catch (_) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
   if (!match) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
   const token = generateToken({ id: user.id, role: user.role, email: user.email });
   res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
-  res.json({ message: 'Login successful', role: user.role });
+  res.json({ message: 'Login successful', role: user.role, email: user.email });
+});
+
+/** Current user endpoint */
+app.get('/api/auth/me', authenticate, (req, res) => {
+  res.json({ user: req.user });
 });
 
 /** Logout endpoint */
@@ -570,116 +656,6 @@ app.get('/api/admin/teachers', authenticate, requireRole('admin'), async (req, r
   }
   res.json(result);
 });
-// Get all teachers (optionally filter by department or search query)
-// ---------- Student API: Find a Teacher ----------
-// Search teachers with various filters (read‑only for students)
-app.get('/api/student/teachers', authenticate, requireRole('student', 'admin'), async (req, res) => {
-  const { name, department, subject, teacherId, designation, q } = req.query;
-  const teachers = await db.read('teachers.json');
-  let result = teachers;
-  if (teacherId) result = result.filter(t => t.id === teacherId);
-  if (name) {
-    const lc = name.toLowerCase();
-    result = result.filter(t => t.fullName && t.fullName.toLowerCase().includes(lc));
-  }
-  if (designation) {
-    const lc = designation.toLowerCase();
-    result = result.filter(t => t.designation && t.designation.toLowerCase().includes(lc));
-  }
-  if (department) result = result.filter(t => t.departmentId === department);
-  if (subject) result = result.filter(t => (t.subjectsTaught || []).includes(subject));
-  if (q) {
-    const lc = q.toLowerCase();
-    result = result.filter(t =>
-      (t.fullName && t.fullName.toLowerCase().includes(lc)) ||
-      (t.email && t.email.toLowerCase().includes(lc))
-    );
-  }
-  res.json(result);
-});
-
-// Get full teacher profile with timetable info (read‑only)
-app.get('/api/student/teacher/:id', authenticate, requireRole('student', 'admin'), async (req, res) => {
-  const { id } = req.params;
-  const teacher = await db.getById('teachers.json', id);
-  if (!teacher) return res.status(404).json({ message: 'Teacher not found' });
-  const timetable = await db.read('timetable.json');
-  const teacherSchedule = timetable.filter(entry => entry.teacherId === id);
-  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long' });
-  const todays = teacherSchedule.filter(e => e.day === today);
-  const upcoming = teacherSchedule.filter(e => {
-    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    const idx = days.indexOf(e.day);
-    const todayIdx = days.indexOf(today);
-    return idx > todayIdx;
-  });
-  res.json({ teacher, schedule: teacherSchedule, todays, upcoming });
-});
-
-// Availability check for a teacher
-app.post('/api/student/teacher/:id/availability', authenticate, requireRole('student', 'admin'), async (req, res) => {
-  const { id } = req.params;
-  const { date, day, startTime, endTime, department } = req.body; // HH:MM 24h format
-  const teacher = await db.getById('teachers.json', id);
-  if (!teacher) return res.status(404).json({ message: 'Teacher not found' });
-  const timetable = await db.read('timetable.json');
-  const entries = timetable.filter(e => e.teacherId === id && (!department || e.departmentId === department));
-
-  const toMins = t => {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m;
-  };
-  const queryStart = toMins(startTime);
-  const queryEnd = toMins(endTime);
-
-  const overlapping = entries.filter(e => {
-    if (day && e.day !== day) return false;
-    const clsStart = toMins(e.startTime);
-    const clsEnd = toMins(e.endTime);
-    return !(clsEnd <= queryStart || clsStart >= queryEnd);
-  });
-
-  let status = 'Not scheduled';
-  if (overlapping.length) status = 'Busy';
-
-  // Compute free intervals
-  const occupied = overlapping.map(e => ({ start: toMins(e.startTime), end: toMins(e.endTime) }));
-  occupied.sort((a, b) => a.start - b.start);
-  const freeIntervals = [];
-  let cursor = queryStart;
-  for (const occ of occupied) {
-    if (occ.start > cursor) freeIntervals.push({ start: cursor, end: occ.start });
-    cursor = Math.max(cursor, occ.end);
-  }
-  if (cursor < queryEnd) freeIntervals.push({ start: cursor, end: queryEnd });
-
-  const fmt = mins => {
-    const h = String(Math.floor(mins / 60)).padStart(2, '0');
-    const m = String(mins % 60).padStart(2, '0');
-    return `${h}:${m}`;
-  };
-  const freeSlots = freeIntervals.map(i => ({ start: fmt(i.start), end: fmt(i.end) }));
-
-  res.json({ status, overlapping, freeSlots });
-});
-
-// Teacher Management APIs (Admin only)
-app.get('/api/admin/teachers', authenticate, requireRole('admin'), async (req, res) => {
-  const { department, q } = req.query;
-  const teachers = await db.read('teachers.json');
-  let result = teachers;
-  if (department) {
-    result = result.filter(t => t.departmentId === department);
-  }
-  if (q) {
-    const lc = q.toLowerCase();
-    result = result.filter(t =>
-      (t.fullName && t.fullName.toLowerCase().includes(lc)) ||
-      (t.email && t.email.toLowerCase().includes(lc))
-    );
-  }
-  res.json(result);
-});
 
 // Add a new teacher and associated user account
 app.post('/api/admin/teachers', authenticate, requireRole('admin'), async (req, res) => {
@@ -730,9 +706,9 @@ app.post('/api/admin/teachers', authenticate, requireRole('admin'), async (req, 
     active: true,
     createdAt: new Date().toISOString(),
   };
-  await db.add('users.json', userRecord);
+  const createdUser = await db.add('users.json', userRecord);
 
-  res.status(201).json({ teacher: newTeacher, userId: userRecord.id });
+  res.status(201).json({ teacher: newTeacher, userId: createdUser.id });
 });
 
 // Update teacher details (admin only)
@@ -805,10 +781,11 @@ app.get('/api/student/computer-labs', authenticate, requireRole('student'), hand
     if (validation.error) return res.status(400).json({ message: validation.error });
     slot = validation.value;
   }
-  const [laboratories, bookings, profile] = await Promise.all([
+  const [laboratories, bookings, profile, maintenance] = await Promise.all([
     db.read('laboratories.json'),
     db.read('lab_bookings.json'),
     getComputerLabStudent(req.user),
+    db.read('maintenance.json'),
   ]);
   const labs = laboratories.filter(activeComputerLab).map((lab) => {
     const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
@@ -816,13 +793,17 @@ app.get('/api/student/computer-labs', authenticate, requireRole('student'), hand
       ...lab,
       category: lab.category || lab.type || 'LPC',
       computers: computers.filter((computer) => computer.active !== false).map((computer) => {
-        const reservation = slot && bookings.find((booking) =>
+        const inMaintenance = slot && isComputerUnderMaintenance(computer.id, lab.id, slot, maintenance);
+        const reservation = slot && !inMaintenance && bookings.find((booking) =>
           isComputerLabBooking(booking) &&
           booking.labId === lab.id &&
           booking.computerId === computer.id &&
           computerLabOverlaps(booking, slot)
         );
-        return { ...computer, availability: slot ? (reservation ? 'occupied' : 'available') : 'unknown' };
+        return {
+          ...computer,
+          availability: slot ? (inMaintenance ? 'maintenance' : (reservation ? 'occupied' : 'available')) : 'unknown',
+        };
       }),
     };
   });
@@ -849,9 +830,10 @@ app.post('/api/student/computer-lab-bookings', authenticate, requireRole('studen
   if (typeof labId !== 'string' || !labId.trim() || typeof computerId !== 'string' || !computerId.trim()) {
     return res.status(400).json({ message: 'Choose a laboratory and an available computer.' });
   }
-  const [laboratories, profile] = await Promise.all([
+  const [laboratories, profile, maintenance] = await Promise.all([
     db.read('laboratories.json'),
     getComputerLabStudent(req.user),
+    db.read('maintenance.json'),
   ]);
   const lab = laboratories.find((item) => item.id === labId && activeComputerLab(item));
   if (!lab) return res.status(404).json({ message: 'Computer laboratory not found.' });
@@ -861,6 +843,10 @@ app.post('/api/student/computer-lab-bookings', authenticate, requireRole('studen
   const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
   const computer = computers.find((item) => item.id === computerId && item.active !== false);
   if (!computer) return res.status(404).json({ message: 'Computer not found in this laboratory.' });
+
+  if (isComputerUnderMaintenance(computer.id, lab.id, validation.value, maintenance)) {
+    return res.status(409).json({ message: 'That computer is currently scheduled for maintenance during the requested time.' });
+  }
   const reservation = {
     labId: lab.id,
     labName: lab.name || 'Computer laboratory',
@@ -934,22 +920,27 @@ app.get('/api/admin/computer-labs', authenticate, requireRole('admin'), handleAs
     if (validation.error) return res.status(400).json({ message: validation.error });
     slot = validation.value;
   }
-  const [laboratories, bookings] = await Promise.all([
+  const [laboratories, bookings, maintenance] = await Promise.all([
     db.read('laboratories.json'),
     db.read('lab_bookings.json'),
+    db.read('maintenance.json'),
   ]);
   const labs = laboratories.map((lab) => {
     const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
     const activeComputers = computers.filter((computer) => computer.active !== false).map((computer) => {
-      const reservation = slot && bookings.find((booking) =>
+      const inMaintenance = slot && isComputerUnderMaintenance(computer.id, lab.id, slot, maintenance);
+      const reservation = slot && !inMaintenance && bookings.find((booking) =>
         isComputerLabBooking(booking) &&
         booking.labId === lab.id &&
         booking.computerId === computer.id &&
         computerLabOverlaps(booking, slot)
       );
-      return { ...computer, availability: slot ? (reservation ? 'occupied' : 'available') : 'unknown' };
+      return {
+        ...computer,
+        availability: slot ? (inMaintenance ? 'maintenance' : (reservation ? 'occupied' : 'available')) : 'unknown',
+      };
     });
-    const occupied = activeComputers.filter((computer) => computer.availability === 'occupied').length;
+    const occupied = activeComputers.filter((computer) => computer.availability === 'occupied' || computer.availability === 'maintenance').length;
     return {
       ...lab,
       category: lab.category || lab.type || 'LPC',
@@ -1107,24 +1098,36 @@ app.post('/api/admin/computer-lab-requests/:id/decision', authenticate, requireR
   }
   const timeValidation = validateComputerLabTime(request);
   if (timeValidation.error) return res.status(409).json({ message: 'The requested time has passed and cannot be approved.' });
-  const lab = await db.getById('laboratories.json', request.labId);
+  const [lab, maintenance] = await Promise.all([
+    db.getById('laboratories.json', request.labId),
+    db.read('maintenance.json'),
+  ]);
   if (!lab || !activeComputerLab(lab)) return res.status(409).json({ message: 'This laboratory is no longer active.' });
+  if (isLabUnderMaintenance(lab.id, request, maintenance)) {
+    return res.status(409).json({ message: 'This laboratory is under maintenance during the requested time.' });
+  }
   const computers = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
   const specifiedComputer = computerId ? computers.find((item) => item.id === computerId && item.active !== false) : null;
   if (computerId && !specifiedComputer) return res.status(400).json({ message: 'Choose an active computer in this laboratory.' });
+  if (specifiedComputer && isComputerUnderMaintenance(specifiedComputer.id, lab.id, request, maintenance)) {
+    return res.status(409).json({ message: 'That computer is under maintenance during the requested time.' });
+  }
   const result = await db.mutate('lab_bookings.json', (bookings) => {
     const current = bookings.find((booking) => booking.id === request.id);
     if (!current || String(current.status).toLowerCase() !== 'pending') {
       return { changed: false, value: { error: 'This request has already been reviewed.' } };
     }
     const availableComputer = (specifiedComputer ? [specifiedComputer] : computers.filter((item) => item.active !== false))
-      .find((computer) => !bookings.some((booking) =>
-        booking.id !== current.id &&
-        isComputerLabBooking(booking) &&
-        reservationConflicts(booking, { ...current, computerId: computer.id })
-      ));
+      .find((computer) =>
+        !isComputerUnderMaintenance(computer.id, lab.id, request, maintenance) &&
+        !bookings.some((booking) =>
+          booking.id !== current.id &&
+          isComputerLabBooking(booking) &&
+          reservationConflicts(booking, { ...current, computerId: computer.id })
+        )
+      );
     if (!availableComputer) {
-      return { changed: false, value: { error: 'No computer is available for this request time.', conflict: true } };
+      return { changed: false, value: { error: 'No computer is available for this request time due to reservations or maintenance.', conflict: true } };
     }
     Object.assign(current, {
       status: 'approved',
@@ -1157,12 +1160,17 @@ app.post('/api/student/classrooms/search', authenticate, requireRole('student'),
   const validation = validateClassroomSearch(req.body);
   if (validation.error) return res.status(400).json({ message: validation.error });
   const filters = validation.value;
-  const [rooms, timetable, reservations, maintenance] = await Promise.all([
+  const [rooms, timetable, reservations, classroomMaintenance, generalMaintenance] = await Promise.all([
     db.read('classrooms.json'),
     db.read('timetable.json'),
     db.read('classroom_reservations.json'),
     db.read('classroom_maintenance.json'),
+    db.read('maintenance.json'),
   ]);
+  const maintenance = [
+    ...(Array.isArray(classroomMaintenance) ? classroomMaintenance : []),
+    ...(Array.isArray(generalMaintenance) ? generalMaintenance.filter(m => m.type === 'classroom') : []),
+  ];
   const available = findAvailableClassrooms({ rooms, timetable, reservations, maintenance, ...filters });
   res.json({ classrooms: available });
 }));
@@ -1175,11 +1183,16 @@ app.post('/api/student/classroom-reservations', authenticate, requireRole('stude
   const validation = validateClassroomSearch({ ...req.body, minCapacity: 1 });
   if (validation.error) return res.status(400).json({ message: validation.error });
   const filters = validation.value;
-  const [rooms, timetable, maintenance] = await Promise.all([
+  const [rooms, timetable, classroomMaintenance, generalMaintenance] = await Promise.all([
     db.read('classrooms.json'),
     db.read('timetable.json'),
     db.read('classroom_maintenance.json'),
+    db.read('maintenance.json'),
   ]);
+  const maintenance = [
+    ...(Array.isArray(classroomMaintenance) ? classroomMaintenance : []),
+    ...(Array.isArray(generalMaintenance) ? generalMaintenance.filter(m => m.type === 'classroom') : []),
+  ];
   const available = findAvailableClassrooms({
     rooms,
     timetable,
@@ -1206,6 +1219,82 @@ app.post('/api/student/classroom-reservations', authenticate, requireRole('stude
   if (!result.inserted) return res.status(409).json({ message: 'Another student has reserved this classroom for an overlapping time.' });
   res.status(201).json(result.record);
 }));
+
+/** Unified Resource Search Options */
+app.get('/api/student/resources/options', authenticate, handleAsync(async (req, res) => {
+  const [classrooms, laboratories] = await Promise.all([
+    db.read('classrooms.json'),
+    db.read('laboratories.json'),
+  ]);
+  const buildings = new Set();
+  const floors = new Set();
+  const facilities = new Set();
+
+  for (const room of classrooms) {
+    if (room.building) buildings.add(room.building);
+    const floor = room.floorNumber ?? room.floor;
+    if (floor !== null && floor !== undefined) floors.add(String(floor));
+    const facs = room.facilities || room.resources || [];
+    for (const f of (Array.isArray(facs) ? facs : [facs]).filter(Boolean)) facilities.add(f);
+  }
+
+  for (const lab of laboratories) {
+    if (lab.building) buildings.add(lab.building);
+    const floor = lab.floor;
+    if (floor !== null && floor !== undefined) floors.add(String(floor));
+    const eq = lab.equipment || lab.resources || [];
+    for (const e of (Array.isArray(eq) ? eq : [eq]).filter(Boolean)) facilities.add(e);
+  }
+
+  res.json({
+    resourceTypes: [
+      { id: 'all', label: 'All Resource Types' },
+      { id: 'classroom', label: 'Classrooms' },
+      { id: 'computer_lab', label: 'Computer Laboratories' },
+      { id: 'computer', label: 'Individual Workstations' },
+    ],
+    buildings: [...buildings].sort((a, b) => a.localeCompare(b)),
+    floors: [...floors].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+    facilities: [...facilities].sort((a, b) => a.localeCompare(b)),
+  });
+}));
+
+/** Unified Resource Search Handler */
+async function handleUnifiedResourceSearch(req, res) {
+  const input = req.method === 'GET' ? req.query : req.body;
+  const validation = validateUnifiedSearch(input);
+  if (validation.error) return res.status(400).json({ message: validation.error });
+
+  const [classrooms, timetable, classroomReservations, classroomMaintenance, generalMaintenance, laboratories, labBookings] = await Promise.all([
+    db.read('classrooms.json'),
+    db.read('timetable.json'),
+    db.read('classroom_reservations.json'),
+    db.read('classroom_maintenance.json'),
+    db.read('maintenance.json'),
+    db.read('laboratories.json'),
+    db.read('lab_bookings.json'),
+  ]);
+
+  const results = searchUnifiedResources({
+    criteria: validation.value,
+    classrooms,
+    timetable,
+    classroomReservations,
+    classroomMaintenance,
+    maintenance: generalMaintenance,
+    laboratories,
+    labBookings,
+  });
+
+  res.json({
+    resources: results,
+    total: results.length,
+    criteria: validation.value,
+  });
+}
+
+app.get('/api/student/resources/search', authenticate, handleAsync(handleUnifiedResourceSearch));
+app.post('/api/student/resources/search', authenticate, handleAsync(handleUnifiedResourceSearch));
 
 app.get('/api/student/free-classrooms', authenticate, requireRole('student'), async (req, res) => {
   const rooms = await db.read('classrooms.json');
@@ -1350,8 +1439,233 @@ app.delete('/api/admin/timetable/:entryId', authenticate, requireRole('admin'), 
   res.json({ message: 'Entry deactivated' });
 });
 
+// ---------- Admin: Resource Maintenance APIs ----------
+
+app.get('/api/admin/maintenance', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const [maintenanceRecords, laboratories, classrooms] = await Promise.all([
+    db.read('maintenance.json'),
+    db.read('laboratories.json'),
+    db.read('classrooms.json'),
+  ]);
+  const labById = new Map(laboratories.map((lab) => [lab.id, lab]));
+  const classroomById = new Map(classrooms.map((c) => [c.id, c]));
+
+  const now = new Date();
+  const enriched = (Array.isArray(maintenanceRecords) ? maintenanceRecords : []).map((record) => {
+    let resourceName = 'Unknown resource';
+    let subResourceName = null;
+    if (record.type === 'lab') {
+      const lab = labById.get(record.labId);
+      resourceName = lab?.name || 'Laboratory';
+      if (record.computerId && record.computerId !== 'all') {
+        const pcs = Array.isArray(lab?.computers) ? lab.computers : [];
+        const pc = pcs.find((p) => p.id === record.computerId);
+        subResourceName = pc ? pc.name : record.computerId;
+      } else {
+        subResourceName = 'Entire laboratory';
+      }
+    } else if (record.type === 'classroom') {
+      const classroom = classroomById.get(record.classroomId);
+      resourceName = classroom ? (classroom.name || `Room ${classroom.classroomNumber || classroom.roomNumber}`) : 'Classroom';
+    }
+    const computedStatus = getMaintenanceStatus(record, now);
+    return {
+      ...record,
+      resourceName,
+      subResourceName,
+      status: computedStatus,
+    };
+  }).sort((a, b) => {
+    const aDate = `${a.startDate || a.date} ${a.startTime || ''}`;
+    const bDate = `${b.startDate || b.date} ${b.startTime || ''}`;
+    return bDate.localeCompare(aDate);
+  });
+
+  res.json({ maintenance: enriched });
+}));
+
+app.post('/api/admin/maintenance', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const validation = validateMaintenanceInput(req.body);
+  if (validation.error) return res.status(400).json({ message: validation.error });
+  const candidate = validation.value;
+
+  const [laboratories, classrooms, labBookings, classroomReservations, existingMaintenance] = await Promise.all([
+    db.read('laboratories.json'),
+    db.read('classrooms.json'),
+    db.read('lab_bookings.json'),
+    db.read('classroom_reservations.json'),
+    db.read('maintenance.json'),
+  ]);
+
+  let resourceName = '';
+  if (candidate.type === 'lab') {
+    const lab = laboratories.find((l) => l.id === candidate.labId && activeComputerLab(l));
+    if (!lab) return res.status(404).json({ message: 'Computer laboratory not found.' });
+    if (candidate.computerId) {
+      const pcs = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
+      const pc = pcs.find((p) => p.id === candidate.computerId && p.active !== false);
+      if (!pc) return res.status(404).json({ message: 'Computer not found in this laboratory.' });
+      resourceName = `${lab.name} · ${pc.name}`;
+    } else {
+      resourceName = `${lab.name} (Entire lab)`;
+    }
+
+    const conflictBooking = labBookings.find((booking) =>
+      isComputerLabBooking(booking) &&
+      maintenanceConflictsWithReservation(candidate, booking)
+    );
+    if (conflictBooking) {
+      return res.status(409).json({
+        message: `Cannot schedule maintenance: existing confirmed booking for ${conflictBooking.studentName || 'student'} (${conflictBooking.date} ${conflictBooking.startTime}–${conflictBooking.endTime}) conflicts with this window.`,
+        conflict: conflictBooking,
+      });
+    }
+  } else {
+    const classroom = classrooms.find((c) => c.id === candidate.classroomId && c.active !== false);
+    if (!classroom) return res.status(404).json({ message: 'Classroom not found.' });
+    resourceName = classroom.name || `Room ${classroom.classroomNumber || classroom.roomNumber}`;
+
+    const conflictReservation = classroomReservations.find((resItem) =>
+      maintenanceConflictsWithReservation(candidate, resItem)
+    );
+    if (conflictReservation) {
+      return res.status(409).json({
+        message: `Cannot schedule maintenance: classroom has a confirmed reservation on ${conflictReservation.date} (${conflictReservation.startTime}–${conflictReservation.endTime}).`,
+        conflict: conflictReservation,
+      });
+    }
+  }
+
+  if (maintenanceOverlapsWithExisting(candidate, existingMaintenance)) {
+    return res.status(409).json({ message: 'An overlapping maintenance record already exists for this resource.' });
+  }
+
+  const record = {
+    ...candidate,
+    resourceName,
+    status: 'scheduled',
+    active: true,
+    createdBy: req.user.id,
+    createdAt: new Date().toISOString(),
+  };
+
+  const created = await db.add('maintenance.json', record);
+  res.status(201).json({ maintenance: created });
+}));
+
+app.put('/api/admin/maintenance/:id', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const existing = await db.getById('maintenance.json', req.params.id);
+  if (!existing) return res.status(404).json({ message: 'Maintenance record not found.' });
+  const currentStatus = getMaintenanceStatus(existing, new Date());
+  if (currentStatus === 'cancelled' || currentStatus === 'completed') {
+    return res.status(409).json({ message: `Cannot modify a ${currentStatus} maintenance record.` });
+  }
+
+  const validation = validateMaintenanceInput({ ...existing, ...req.body });
+  if (validation.error) return res.status(400).json({ message: validation.error });
+  const candidate = validation.value;
+
+  const [laboratories, classrooms, labBookings, classroomReservations, allMaintenance] = await Promise.all([
+    db.read('laboratories.json'),
+    db.read('classrooms.json'),
+    db.read('lab_bookings.json'),
+    db.read('classroom_reservations.json'),
+    db.read('maintenance.json'),
+  ]);
+
+  if (candidate.type === 'lab') {
+    const lab = laboratories.find((l) => l.id === candidate.labId && activeComputerLab(l));
+    if (!lab) return res.status(404).json({ message: 'Computer laboratory not found.' });
+    if (candidate.computerId) {
+      const pcs = Array.isArray(lab.computers) ? lab.computers : Array.isArray(lab.pcs) ? lab.pcs : [];
+      const pc = pcs.find((p) => p.id === candidate.computerId && p.active !== false);
+      if (!pc) return res.status(404).json({ message: 'Computer not found in this laboratory.' });
+    }
+    const conflictBooking = labBookings.find((booking) =>
+      isComputerLabBooking(booking) &&
+      maintenanceConflictsWithReservation(candidate, booking)
+    );
+    if (conflictBooking) {
+      return res.status(409).json({
+        message: `Cannot update maintenance: conflicting confirmed booking exists on ${conflictBooking.date} (${conflictBooking.startTime}–${conflictBooking.endTime}).`,
+      });
+    }
+  } else {
+    const classroom = classrooms.find((c) => c.id === candidate.classroomId && c.active !== false);
+    if (!classroom) return res.status(404).json({ message: 'Classroom not found.' });
+    const conflictReservation = classroomReservations.find((resItem) =>
+      maintenanceConflictsWithReservation(candidate, resItem)
+    );
+    if (conflictReservation) {
+      return res.status(409).json({
+        message: `Cannot update maintenance: classroom has a confirmed reservation on ${conflictReservation.date} (${conflictReservation.startTime}–${conflictReservation.endTime}).`,
+      });
+    }
+  }
+
+  if (maintenanceOverlapsWithExisting(candidate, allMaintenance, existing.id)) {
+    return res.status(409).json({ message: 'An overlapping maintenance record already exists for this resource.' });
+  }
+
+  const updated = await db.update('maintenance.json', existing.id, {
+    ...candidate,
+    updatedAt: new Date().toISOString(),
+    updatedBy: req.user.id,
+  });
+
+  res.json({ maintenance: updated });
+}));
+
+app.delete('/api/admin/maintenance/:id', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const existing = await db.getById('maintenance.json', req.params.id);
+  if (!existing) return res.status(404).json({ message: 'Maintenance record not found.' });
+  if (existing.status === 'cancelled' || existing.active === false) {
+    return res.status(409).json({ message: 'Maintenance record is already cancelled.' });
+  }
+
+  const updated = await db.update('maintenance.json', existing.id, {
+    status: 'cancelled',
+    active: false,
+    cancelledAt: new Date().toISOString(),
+    cancelledBy: req.user.id,
+  });
+
+  res.json({ message: 'Maintenance record cancelled.', maintenance: updated });
+}));
+
+app.post('/api/admin/maintenance/:id/cancel', authenticate, requireRole('admin'), handleAsync(async (req, res) => {
+  const existing = await db.getById('maintenance.json', req.params.id);
+  if (!existing) return res.status(404).json({ message: 'Maintenance record not found.' });
+  if (existing.status === 'cancelled' || existing.active === false) {
+    return res.status(409).json({ message: 'Maintenance record is already cancelled.' });
+  }
+
+  const updated = await db.update('maintenance.json', existing.id, {
+    status: 'cancelled',
+    active: false,
+    cancelledAt: new Date().toISOString(),
+    cancelledBy: req.user.id,
+  });
+
+  res.json({ message: 'Maintenance record cancelled.', maintenance: updated });
+}));
 
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+
+export { app };
+export default app;
+
+const isMainModule = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isMainModule) {
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${PORT} is already in use. Please set PORT=<port> or stop the conflicting process.`);
+    } else {
+      console.error(`❌ Server startup error:`, err);
+    }
+    process.exit(1);
+  });
+}

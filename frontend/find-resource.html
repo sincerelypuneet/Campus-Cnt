@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Find a Free Resource | CampusSpace</title>
+  <link rel="stylesheet" href="classroom-finder.css" />
+  <link rel="stylesheet" href="resource-finder.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <script src="theme.js" defer></script>
+  <script src="resource-finder.js" defer></script>
+</head>
+<body>
+  <header class="finder-topbar">
+    <a class="brand" href="student.html"><span class="brand-mark">C</span> CampusSpace</a>
+    <div class="topbar-actions">
+      <a class="back-link" href="student.html">← Student dashboard</a>
+    </div>
+  </header>
+
+  <main class="finder-main">
+    <section class="intro">
+      <p class="eyebrow">UNIFIED RESOURCE SEARCH</p>
+      <h1>Find a free campus resource</h1>
+      <p>Discover available classrooms, computer laboratories, and individual workstations in one place. Real-time availability checks ensure spaces and computers are verified free before you book.</p>
+    </section>
+
+    <section class="finder-panel" aria-labelledby="search-title">
+      <div class="panel-heading">
+        <div>
+          <h2 id="search-title">Search parameters &amp; filters</h2>
+          <p>Choose your desired time slot, resource type, and location. Exact interval validation checks timetable commitments, existing reservations, and lab maintenance.</p>
+        </div>
+        <span class="read-only">Verified Availability</span>
+      </div>
+
+      <form id="resource-search" class="finder-form">
+        <label class="form-field">
+          <span>Resource type</span>
+          <select name="type" id="filter-type">
+            <option value="all">All Resource Types</option>
+            <option value="classroom">Classrooms</option>
+            <option value="computer_lab">Computer Laboratories</option>
+            <option value="computer">Individual Workstations</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Date</span>
+          <input name="date" id="filter-date" type="date" required />
+        </label>
+
+        <label class="form-field">
+          <span>Start time</span>
+          <input name="startTime" id="filter-start-time" type="time" required />
+        </label>
+
+        <label class="form-field">
+          <span>End time</span>
+          <input name="endTime" id="filter-end-time" type="time" required />
+        </label>
+
+        <label class="form-field">
+          <span>Building</span>
+          <select name="building" id="filter-building">
+            <option value="">All buildings</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Minimum capacity</span>
+          <input name="minCapacity" id="filter-capacity" type="number" min="1" max="10000" value="1" />
+        </label>
+
+        <label class="form-field">
+          <span>Equipment / Facilities</span>
+          <input name="equipment" id="filter-equipment" type="text" placeholder="e.g. Projector, GPU, Arduino" />
+        </label>
+
+        <label class="form-field">
+          <span>Sort results by</span>
+          <select name="sortBy" id="filter-sort-by">
+            <option value="availability">Availability first</option>
+            <option value="capacity">Capacity (highest first)</option>
+            <option value="name">Name (A–Z)</option>
+            <option value="type">Resource type</option>
+          </select>
+        </label>
+
+        <label class="form-field form-field--checkbox">
+          <input name="availableOnly" id="filter-available-only" type="checkbox" />
+          <span>Show available resources only</span>
+        </label>
+
+        <div class="form-actions form-actions--split">
+          <button class="button button--primary" type="submit" id="search-submit">Search resources</button>
+          <button class="button button--quiet" type="button" id="clear-filters">Clear filters</button>
+        </div>
+      </form>
+    </section>
+
+    <p id="finder-message" class="message" role="status" aria-live="polite"></p>
+
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="results-heading">
+        <div>
+          <h2 id="results-title">Resource search results</h2>
+          <p id="results-summary">Select a date and time slot above to discover available resources.</p>
+        </div>
+        <div class="results-stats" id="results-stats" hidden>
+          <span class="badge badge--neutral" id="total-stat">0 resources</span>
+          <span class="badge badge--success" id="available-stat">0 available</span>
+        </div>
+      </div>
+
+      <div id="resource-results" class="resource-results-grid"></div>
+    </section>
+  </main>
+
+  <!-- Action Modal for Booking / HPC Request -->
+  <div class="modal-backdrop" id="action-modal" hidden>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h3 id="modal-title">Confirm Resource Reservation</h3>
+        <button class="close-button" id="modal-close" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer" id="modal-footer">
+        <button class="button button--quiet" type="button" id="modal-cancel">Cancel</button>
+        <button class="button button--primary" type="button" id="modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

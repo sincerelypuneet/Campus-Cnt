@@ -4,6 +4,7 @@
     teachers: 'Find a Teacher',
     availability: 'Teacher Availability',
     classrooms: 'Find Free Classroom',
+    resources: 'Find a Free Resource',
     labs: 'Computer Labs',
     requests: 'My Lab Requests',
     notifications: 'Notifications',
@@ -227,6 +228,33 @@
       <section class="card-grid">${rooms || emptyState('No classrooms listed', 'Classrooms will appear here when campus records are available.')}</section>`;
   }
 
+  function resourcesView() {
+    return `${pageHeading('Find a Free Resource', 'Search across classrooms, computer laboratories, and individual workstations in one unified interface.', '<a class="button button--primary" href="find-resource.html">Open unified search</a>')}
+      <section class="panel detail-panel">
+        <div class="section-title-row">
+          <div>
+            <h2>Unified Resource Finder</h2>
+            <p class="panel-subtitle">Check verified availability for all spaces, labs, and workstations by exact date and time interval.</p>
+          </div>
+          <a class="button button--primary" href="find-resource.html">Launch Resource Finder →</a>
+        </div>
+        <div class="card-grid" style="margin-top:20px;">
+          <article class="info-card">
+            <h3>🏫 Classrooms</h3>
+            <p>Search by seating capacity, building, and equipment. Only verified free rooms are displayed.</p>
+          </article>
+          <article class="info-card">
+            <h3>🖥 Computer Labs</h3>
+            <p>Find open labs with free workstations or submit HPC access requests for approval.</p>
+          </article>
+          <article class="info-card">
+            <h3>💻 Workstations</h3>
+            <p>Book individual LPC computers directly or check workstation hardware specifications.</p>
+          </article>
+        </div>
+      </section>`;
+  }
+
   function labsView() {
     const labs = data.labs.map((lab) => `<article class="info-card"><div class="section-title-row"><h3>${escapeHtml(lab.name || 'Computer lab')}</h3><span class="status status--neutral">Open booking system</span></div>
       <p>${escapeHtml([lab.building, lab.floor, lab.room].filter(Boolean).join(' · ') || 'Location not listed')}</p>
@@ -272,7 +300,7 @@
     updateHeader();
     const renderers = {
       dashboard, teachers: teachersView, availability: availabilityView, classrooms: classroomsView,
-      labs: labsView, requests: requestsView, notifications: notificationsView, profile: profileView
+      resources: resourcesView, labs: labsView, requests: requestsView, notifications: notificationsView, profile: profileView
     };
     page.innerHTML = renderers[activeView]();
   }
@@ -347,7 +375,7 @@
       }
       form.reset();
       const next = new URLSearchParams(window.location.search).get('next');
-      if (['find-classroom.html', 'find-teacher.html'].includes(next)) {
+      if (['find-classroom.html', 'find-teacher.html', 'find-resource.html'].includes(next)) {
         window.location.assign(next);
         return;
       }

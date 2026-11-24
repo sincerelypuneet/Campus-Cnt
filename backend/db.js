@@ -35,7 +35,7 @@ async function read(fileName) {
     }
     // Corrupted JSON – backup and reinitialize
     console.warn(`Corrupted JSON in ${fileName}: ${err.message}. Backing up and resetting.`);
-    const backupPath = `${filePath}.bak.${new Date().toISOString()}`;
+    const backupPath = `${filePath}.bak`;
     await fs.copyFile(filePath, backupPath);
     const defaultData = fileName === 'settings.json' ? {} : [];
     await write(fileName, defaultData);
@@ -46,8 +46,8 @@ async function read(fileName) {
 /** Atomic write with backup */
 async function write(fileName, data) {
   const filePath = resolveFile(fileName);
-  const tmpPath = `${filePath}.tmp`;
-  const backupPath = `${filePath}.bak.${new Date().toISOString()}`;
+  const tmpPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
+  const backupPath = `${filePath}.bak`;
 
   const json = JSON.stringify(data, null, 2);
   // Backup current file if it exists

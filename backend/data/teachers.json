@@ -197,5 +197,36 @@
     "contactNumber": "",
     "profileImage": null,
     "createdAt": "2026-11-16T14:44:39.159Z"
+  },
+  {
+    "id": "07bfde24-72d5-4531-a0c5-8a254e778743",
+    "fullName": "Gajendra Purohit Sir",
+    "email": "admin1@campusspace.local",
+    "contactNumber": "NA",
+    "departmentId": "bbfd444b-d3f8-4cf1-920d-8cb1be9da214",
+    "designation": "Faculty",
+    "subjectsTaught": [
+      "Alogorithm",
+      "Data Structures"
+    ],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": true,
+    "createdAt": "2026-11-20T15:39:46.717Z"
+  },
+  {
+    "id": "cab4643e-f3bf-4591-8543-8ca70ee8fd96",
+    "fullName": "Dr. Jane Quantum",
+    "email": "faculty.test.1795434603316@campusspace.local",
+    "contactNumber": "555-0199",
+    "departmentId": "dept-1",
+    "designation": "Associate Professor",
+    "subjectsTaught": [
+      "Quantum Physics"
+    ],
+    "assignedClassrooms": [],
+    "profileImage": null,
+    "active": false,
+    "createdAt": "2026-11-23T11:50:03.318Z"
   }
 ]

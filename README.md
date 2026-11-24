@@ -44,10 +44,38 @@ For a normal start without the development watcher:
 npm start
 ```
 
-The application listens on `http://localhost:3000` by default. Set the `PORT` environment variable to use a different port.
+To run the automated tests:
+
+```sh
+npm test
+```
+
+To initialize default data files and the administrative account:
+
+```sh
+npm run init-db
+```
+
+To create or reset a local admin account password securely:
+
+```sh
+node backend/reset-admin-password.js <admin_email> <new_password>
+# Or using environment variables:
+ADMIN_EMAIL=admin@campusspace.local ADMIN_PASSWORD=YourSecurePassword node backend/reset-admin-password.js
+```
+
+The application listens on `http://localhost:3000` by default. Environment variables can be configured in `.env` (see `.env.example`). Set the `PORT` environment variable to use a different port.
+
+## Active Backend Setup
+
+- **Server Entry Point**: `backend/server.js` (ES Modules) serves the static frontend from `frontend/` and provides API endpoints under `/api`.
+- **Database Engine**: `backend/db.js` provides atomic, serial, queued read/write operations for JSON data files stored in `backend/data/`.
+- **Authentication**: JWT stored in an HTTP-only cookie (`token`) or provided via `Authorization: Bearer <token>` header, with role-based access control (`admin`, `student`, `teacher`).
 
 ## Verify
 
-- Visit `http://localhost:3000` to choose the Admin / Teacher or Student portal.
-- Visit `http://localhost:3000/api/health` to verify the JSON API.
-- Open the Student portal and sign in with a student account. Student accounts and campus resource records must already exist in the backend data files; the portal does not populate demo records.
+- Visit `http://localhost:3000` to access the welcome page and choose the Admin / Teacher or Student portal.
+- Visit `http://localhost:3000/api/health` to verify the JSON API health status (`{"status":"ok","service":"CampusSpace API"}`).
+- Run `npm test` to execute automated test suites.
+- Open the Student portal and sign in with a student account (`student@campusspace.local`).
+- Open the Admin portal and sign in with an admin account (`admin@campusspace.local`).

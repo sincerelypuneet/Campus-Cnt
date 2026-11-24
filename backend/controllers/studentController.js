@@ -153,12 +153,16 @@ export async function createLabRequest(request, response) {
   const record = await db.add('lab_bookings.json', {
     labId,
     labName: lab.name || 'Computer lab',
+    category: lab.category || lab.type || 'HPC',
     studentId: context.studentId,
     userId: request.user.id,
     date,
+    startTime,
+    endTime,
     timeSlot: `${startTime} - ${endTime}`,
     purpose: purpose.trim(),
-    status: 'Pending',
+    status: 'pending',
+    sentTo: 'Lab Head/Admin',
     createdAt: new Date().toISOString(),
   });
   response.status(201).json(record);

@@ -182,6 +182,60 @@
           <h2>HPC booking requests</h2>
           <div class="admin-request-list" id="admin-hpc-request-list"></div>
         </section>
+
+        <!-- Lab & Resource Maintenance -->
+        <section class="admin-lab-panel admin-maintenance-panel" id="admin-maintenance-section">
+          <h2>Lab &amp; Resource Maintenance</h2>
+          <p class="admin-lab-muted">Schedule maintenance windows for laboratories, individual PCs, or classrooms.</p>
+          <form id="admin-maintenance-form" class="admin-lab-form admin-maintenance-form">
+            <label>Resource type
+              <select name="type" id="maintenance-type-select" required>
+                <option value="lab">Computer Laboratory</option>
+                <option value="classroom">Classroom</option>
+              </select>
+            </label>
+            <label id="maintenance-lab-group">Laboratory
+              <select name="labId" id="maintenance-lab-select"></select>
+            </label>
+            <label id="maintenance-pc-group">Computer
+              <select name="computerId" id="maintenance-pc-select">
+                <option value="all">Entire Laboratory (All PCs)</option>
+              </select>
+            </label>
+            <label id="maintenance-classroom-group" style="display: none;">Classroom
+              <select name="classroomId" id="maintenance-classroom-select"></select>
+            </label>
+            <label>Date
+              <input type="date" name="date" id="maintenance-date-input" required />
+            </label>
+            <label>Start time
+              <input type="time" name="startTime" required />
+            </label>
+            <label>End time
+              <input type="time" name="endTime" required />
+            </label>
+            <label class="admin-lab-wide">Reason
+              <input type="text" name="reason" maxlength="120" placeholder="e.g. Hardware upgrade or repair" required />
+            </label>
+            <label class="admin-lab-wide">Description
+              <textarea name="description" maxlength="500" rows="2" placeholder="Optional details..."></textarea>
+            </label>
+            <div class="admin-lab-actions admin-lab-wide">
+              <button class="action-btn" type="submit">Schedule Maintenance</button>
+            </div>
+          </form>
+
+          <div class="maintenance-header-row" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <h3>Scheduled &amp; Active Maintenance</h3>
+            <div class="category-switch" role="group" aria-label="Filter maintenance">
+              <button type="button" class="category-button is-active" data-maintenance-filter="all">All</button>
+              <button type="button" class="category-button" data-maintenance-filter="scheduled">Upcoming</button>
+              <button type="button" class="category-button" data-maintenance-filter="active">Active</button>
+              <button type="button" class="category-button" data-maintenance-filter="completed">Completed</button>
+            </div>
+          </div>
+          <div class="admin-maintenance-list" id="admin-maintenance-list" style="margin-top: 12px; display: grid; gap: 10px;"></div>
+        </section>
       </section>
 
       <section class="placeholder" id="placeholder-section" hidden>

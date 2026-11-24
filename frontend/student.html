@@ -3,159 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f2f7fc" />
+  <meta name="theme-color" content="#f5f7fb" />
   <title>Student Dashboard | CampusSpace</title>
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="student.css" />
   <link rel="stylesheet" href="theme.css" />
   <script src="theme.js" defer></script>
+  <script src="student.js" defer></script>
 </head>
 <body>
-  <div class="wrapper">
-    <nav class="sidebar" id="sidebar" aria-label="Student navigation">
-      <div class="sidebar-header">
-        <h2>CampusSpace</h2>
+  <section class="login-screen" id="login-screen" aria-labelledby="login-title">
+    <div class="login-card">
+      <a class="brand brand--login" href="index.html"><span class="brand-mark">C</span> CampusSpace</a>
+      <p class="eyebrow">YOUR CAMPUS, MADE SIMPLE</p>
+      <h1 id="login-title">Welcome to your student space</h1>
+      <p class="muted">Sign in with your campus account to find teachers, rooms, and computer labs.</p>
+      <form id="login-form" class="login-form">
+        <label for="login-email">Campus email</label>
+        <input id="login-email" name="email" type="email" autocomplete="username" required />
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+        <button class="button button--primary button--wide" type="submit">Sign in <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="form-message" id="login-message" role="alert"></p>
+      <a class="back-link" href="index.html">← Back to CampusSpace</a>
+    </div>
+  </section>
+
+  <div class="app-shell" id="app-shell" hidden>
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="student.html"><span class="brand-mark">C</span> CampusSpace</a>
+      <p class="sidebar-label">STUDENT MENU</p>
+      <nav class="navigation" aria-label="Student navigation">
+        <button class="nav-item is-active" data-view="dashboard"><span class="nav-icon">⌂</span>Dashboard</button>
+        <button class="nav-item" data-view="teachers"><span class="nav-icon">♙</span>Find a Teacher</button>
+        <button class="nav-item" data-view="availability"><span class="nav-icon">◷</span>Teacher Availability</button>
+        <button class="nav-item" data-view="classrooms"><span class="nav-icon">▤</span>Find Free Classroom</button>
+        <button class="nav-item" data-view="resources"><span class="nav-icon">🔍</span>Find a Free Resource</button>
+        <button class="nav-item" data-view="labs"><span class="nav-icon">▦</span>Computer Labs</button>
+        <button class="nav-item" data-view="requests"><span class="nav-icon">▧</span>My Lab Requests</button>
+        <button class="nav-item" data-view="notifications"><span class="nav-icon">♧</span>Notifications<span class="nav-badge" id="notification-count" hidden></span></button>
+        <button class="nav-item" data-view="profile"><span class="nav-icon">◉</span>My Profile</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-help"><span class="help-icon">?</span><span><strong>Need a hand?</strong><small>Ask your campus office</small></span></div>
+        <button class="nav-item nav-logout" id="logout-button"><span class="nav-icon">↪</span>Logout</button>
       </div>
-      <ul class="nav-list">
-        <li><a href="#dashboard" class="nav-link active" data-section="dashboard" aria-current="page">Dashboard</a></li>
-        <li><a href="find-teacher.html" class="nav-link">Find a Teacher</a></li>
-        
-        <li><a href="find-classroom.html" class="nav-link">Find Free Classroom</a></li>
-        <li><a href="computer-labs.html" class="nav-link">Computer Labs</a></li>
-        <li><a href="#notifications" class="nav-link" data-section="notifications">Notifications</a></li>
-        <li><a href="#profile" class="nav-link" data-section="profile">My Profile</a></li>
-        <li><a href="index.html" class="nav-link">Logout</a></li>
-      </ul>
-    </nav>
+    </aside>
 
-    <main class="content" id="main-content">
+    <div class="main-column">
       <header class="topbar">
-        <button class="toggle-btn" id="toggle-sidebar" type="button" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="true">☰</button>
-        <div class="profile">
-          <span>Student Portal</span>
-          <span class="avatar" aria-hidden="true" style="display:grid;place-items:center;color:#fff;font-weight:600">S</span>
-        </div>
+        <button class="menu-button" id="menu-button" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <div class="breadcrumb"><span>Student portal</span><span class="breadcrumb-divider">/</span><strong id="view-name">Dashboard</strong></div>
+        <div class="topbar-profile"><span class="online-dot"></span><span id="student-email"></span><span class="user-avatar" id="user-avatar">S</span></div>
       </header>
-
-      <section class="dashboard" id="dashboard-section">
-        <h1 class="section-title">Dashboard Overview</h1>
-        <div class="today-timetable">
-          <h2>Today's Timetable</h2>
-          <p id="timetable-empty" class="dashboard-state">Your schedule will appear here when it is available.</p>
-        </div>
-        <div class="quick-actions" aria-label="Student quick actions">
-          <a href="find-teacher.html" class="action-btn btn btn-primary">Find a Teacher</a>
-          <a class="action-btn" href="find-classroom.html">Find a Classroom</a>
-          <a class="action-btn" href="computer-labs.html">Explore Computer Labs</a>
-        </div>
-      </section>
-
-      <section class="dashboard" id="teachers-section" hidden>
-        <h1 class="section-title">Find a Teacher</h1>
-        <div class="today-timetable">
-          <h2>Teacher Directory</h2>
-          <p class="dashboard-state">Teacher profiles and contact information will appear here.</p>
-        </div>
-      </section>
-
-      <section class="dashboard" id="availability-section" hidden>
-        <h1 class="section-title">Teacher Availability</h1>
-        <div class="today-timetable">
-          <h2>Today's Availability</h2>
-          <p class="dashboard-state">Published teacher schedules will appear here.</p>
-        </div>
-      </section>
-
-      <section class="dashboard" id="classrooms-section" hidden>
-        <h1 class="section-title">Find a Free Classroom</h1>
-        <div class="today-timetable">
-          <h2>Classroom Availability</h2>
-          <p class="dashboard-state">Classroom availability will appear here.</p>
-        </div>
-      </section>
-
-      <section class="dashboard" id="labs-section" hidden>
-        <h1 class="section-title">Computer Labs</h1>
-        <div class="today-timetable">
-          <h2>Campus Labs</h2>
-          <p class="dashboard-state">Computer lab information will appear here.</p>
-        </div>
-      </section>
-
-      <section class="dashboard" id="notifications-section" hidden>
-        <h1 class="section-title">Notifications</h1>
-        <div class="today-timetable">
-          <h2>Campus Updates</h2>
-          <p class="dashboard-state">You have no notifications to display.</p>
-        </div>
-      </section>
-
-      <section class="dashboard" id="profile-section" hidden>
-        <h1 class="section-title">My Profile</h1>
-        <div class="today-timetable">
-          <h2>Student Account</h2>
-          <p class="dashboard-state">Sign in to view your account information.</p>
-        </div>
-      </section>
-    </main>
+      <main class="page-content" id="page-content" tabindex="-1"></main>
+      <footer class="page-footer">CampusSpace <span>·</span> Your campus, in one place</footer>
+    </div>
   </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidebar = document.getElementById('sidebar');
-      const sidebarToggle = document.getElementById('toggle-sidebar');
-      const links = document.querySelectorAll('.nav-link[data-section]');
-      const sections = {
-        dashboard: document.getElementById('dashboard-section'),
-        teachers: document.getElementById('teachers-section'),
-        availability: document.getElementById('availability-section'),
-        classrooms: document.getElementById('classrooms-section'),
-        labs: document.getElementById('labs-section'),
-        notifications: document.getElementById('notifications-section'),
-        profile: document.getElementById('profile-section')
-      };
-
-      let mobileNavigation = window.matchMedia('(max-width: 768px)').matches;
-      function setNavigationCollapsed(collapsed) {
-        sidebar.classList.toggle('collapsed', collapsed);
-        sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
-      }
-      if (mobileNavigation) setNavigationCollapsed(true);
-      window.addEventListener('resize', () => {
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        if (isMobile !== mobileNavigation) {
-          mobileNavigation = isMobile;
-          setNavigationCollapsed(isMobile);
-        }
-      });
-
-      function showSection(name) {
-        Object.entries(sections).forEach(([key, section]) => {
-          section.hidden = key !== name;
-        });
-        links.forEach((link) => {
-          const active = link.dataset.section === name;
-          link.classList.toggle('active', active);
-          if (active) link.setAttribute('aria-current', 'page');
-          else link.removeAttribute('aria-current');
-        });
-        setNavigationCollapsed(mobileNavigation);
-      }
-
-      links.forEach((link) => {
-        link.addEventListener('click', (event) => {
-          event.preventDefault();
-          showSection(link.dataset.section);
-        });
-      });
-
-      document.querySelectorAll('[data-open-section]').forEach((button) => {
-        button.addEventListener('click', () => showSection(button.dataset.openSection));
-      });
-
-      sidebarToggle.addEventListener('click', () => {
-        setNavigationCollapsed(!sidebar.classList.contains('collapsed'));
-      });
-    });
-  </script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="backdrop" id="backdrop" hidden></div>
 </body>
 </html>

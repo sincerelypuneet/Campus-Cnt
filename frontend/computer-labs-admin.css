@@ -43,6 +43,18 @@
 .admin-request-status.is-pending { color: #a96d2e; background: #fff4e8; }
 .admin-request-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* Maintenance styling */
+.admin-maintenance-card { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 14px; border: 1px solid #edf0f5; border-radius: 9px; background: #fdfdfe; }
+.admin-maintenance-info strong { font-size: 13px; color: #1e2638; }
+.admin-maintenance-info small { display: block; margin-top: 4px; color: #647086; font-size: 11px; }
+.admin-maintenance-info p { margin: 6px 0 0; color: #475467; font-size: 11px; line-height: 1.4; }
+.admin-maintenance-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.status-badge { display: inline-block; padding: 4px 9px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: capitalize; }
+.status-badge.status-scheduled { background: #eef4ff; color: #3538cd; }
+.status-badge.status-active { background: #ecfdf3; color: #027a48; }
+.status-badge.status-completed { background: #f2f4f7; color: #475467; }
+.status-badge.status-cancelled { background: #fef3f2; color: #b42318; }
+
 @media (max-width: 900px) {
   .admin-lab-list { grid-template-columns: 1fr; }
 }

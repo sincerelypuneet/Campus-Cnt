@@ -1,4 +1,8 @@
 node_modules/
 npm-debug.log*
 .env
+*.bak.*
+*.bak
+*.tmp
+backend/data/*.tmp
 backend/database/data/*.tmp

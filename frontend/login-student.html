@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#f5f7fb" />
-  <title>Student Dashboard | CampusSpace</title>
+  <title>Student Sign In | CampusSpace</title>
   <link rel="stylesheet" href="student.css" />
   <link rel="stylesheet" href="theme.css" />
   <script src="theme.js" defer></script>
-  <script src="student.js" defer></script>
+  <script src="login-student.js" defer></script>
 </head>
 <body>
   <section class="login-screen" id="login-screen" aria-labelledby="login-title">
@@ -24,8 +24,7 @@
         <input id="login-password" name="password" type="password" autocomplete="current-password" required />
         <button class="button button--primary button--wide" type="submit">Sign in <span aria-hidden="true">→</span></button>
       </form>
-        <a class="button button--secondary button--wide" href="student.html">Demo Login (no credentials)</a>
-      <p class="form-message" id="login-message" role="alert"></p>
+      <p class="form-message" id="login-message" role="alert" hidden></p>
       <a class="back-link" href="index.html">← Back to CampusSpace</a>
     </div>
   </section>

@@ -2,17 +2,25 @@
   "name": "campus-space",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Smart campus resource management and booking foundation",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "test": "node --test --test-concurrency=1 backend/*.test.js",
+    "init-db": "node backend/init.js",
+    "admin:password": "node backend/reset-admin-password.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

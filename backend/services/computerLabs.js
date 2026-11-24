@@ -26,9 +26,23 @@ export function reservesComputer(booking) {
     booking.computerId.length > 0;
 }
 
+export function isComputerLabBooking(booking) {
+  return Boolean(booking && booking.active !== false && reservesComputer(booking));
+}
+
 export function reservationConflicts(existing, candidate) {
   return reservesComputer(existing) &&
     existing.labId === candidate.labId &&
     existing.computerId === candidate.computerId &&
     overlaps(existing, candidate);
 }
+
+export {
+  isComputerUnderMaintenance,
+  isLabUnderMaintenance,
+  isClassroomUnderMaintenance,
+  validateMaintenanceInput,
+  getMaintenanceStatus,
+  maintenanceConflictsWithReservation,
+  maintenanceOverlapsWithExisting,
+} from './labMaintenance.js';

@@ -134,11 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
   statsGrid.setAttribute('aria-busy', 'true');
   fetch('/api/admin/stats', { credentials: 'same-origin' })
     .then(async response => {
+      if (response.status === 401 || response.status === 403) {
+        window.location.replace('login.html');
+        return null;
+      }
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || `Request failed (${response.status})`);
       return result;
     })
     .then(stats => {
+      if (!stats) return;
       const labels = [
         ['totalTeachers', 'Teachers'],
         ['totalStudents', 'Students'],

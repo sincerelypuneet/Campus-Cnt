@@ -4,10 +4,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const message = document.getElementById('admin-lab-message');
   const createForm = document.getElementById('admin-lab-create-form');
   const utilizationForm = document.getElementById('admin-lab-utilization-form');
+  const maintenanceForm = document.getElementById('admin-maintenance-form');
+  const maintenanceList = document.getElementById('admin-maintenance-list');
+  const maintenanceType = document.getElementById('maintenance-type-select');
+  const maintenanceLabGroup = document.getElementById('maintenance-lab-group');
+  const maintenancePcGroup = document.getElementById('maintenance-pc-group');
+  const maintenanceClassroomGroup = document.getElementById('maintenance-classroom-group');
+  const maintenanceLabSelect = document.getElementById('maintenance-lab-select');
+  const maintenancePcSelect = document.getElementById('maintenance-pc-select');
+  const maintenanceClassroomSelect = document.getElementById('maintenance-classroom-select');
+  const maintenanceDateInput = document.getElementById('maintenance-date-input');
+  let currentLabs = [];
+  let currentClassrooms = [];
+  let allMaintenanceRecords = [];
+  let activeMaintenanceFilter = 'all';
+
   const today = new Date();
   const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   utilizationForm.elements.date.min = localDate;
   utilizationForm.elements.date.value = localDate;
+  if (maintenanceDateInput) {
+    maintenanceDateInput.min = localDate;
+    maintenanceDateInput.value = localDate;
+  }
 
   const escapeHtml = (value) => String(value == null ? '' : value)
     .replace(/[&<>"']/g, (character) => ({
@@ -74,10 +93,138 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadManagement(query = '') {
-    const result = await requestJson(`/api/admin/computer-labs${query}`);
-    labList.innerHTML = (result.labs || []).filter((lab) => lab.active !== false).map(labCard).join('') ||
+    const [result, classroomsData, maintenanceData] = await Promise.all([
+      requestJson(`/api/admin/computer-labs${query}`),
+      requestJson('/api/admin/classrooms').catch(() => []),
+      requestJson('/api/admin/maintenance').catch(() => ({ maintenance: [] })),
+    ]);
+    currentLabs = (result.labs || []).filter((lab) => lab.active !== false);
+    currentClassrooms = Array.isArray(classroomsData) ? classroomsData.filter((c) => c.active !== false) : [];
+    allMaintenanceRecords = maintenanceData.maintenance || [];
+
+    labList.innerHTML = currentLabs.map(labCard).join('') ||
       '<p class="admin-lab-muted">No laboratories yet. Add one above.</p>';
     renderRequests(result.requests || []);
+    populateMaintenanceDropdowns();
+    renderMaintenance();
+  }
+
+  function populateMaintenanceDropdowns() {
+    if (maintenanceLabSelect) {
+      const selectedLabId = maintenanceLabSelect.value;
+      maintenanceLabSelect.innerHTML = currentLabs.map((l) => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.name)}</option>`).join('');
+      if (selectedLabId && currentLabs.some((l) => l.id === selectedLabId)) {
+        maintenanceLabSelect.value = selectedLabId;
+      }
+      updatePcDropdown();
+    }
+    if (maintenanceClassroomSelect) {
+      maintenanceClassroomSelect.innerHTML = currentClassrooms.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name || `Room ${c.classroomNumber || c.roomNumber}`)}</option>`).join('');
+    }
+  }
+
+  function updatePcDropdown() {
+    if (!maintenancePcSelect || !maintenanceLabSelect) return;
+    const lab = currentLabs.find((l) => l.id === maintenanceLabSelect.value);
+    const pcs = lab && Array.isArray(lab.computers) ? lab.computers.filter((p) => p.active !== false) : [];
+    const currentVal = maintenancePcSelect.value;
+    maintenancePcSelect.innerHTML = '<option value="all">Entire Laboratory (All PCs)</option>' +
+      pcs.map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join('');
+    if (currentVal && (currentVal === 'all' || pcs.some((p) => p.id === currentVal))) {
+      maintenancePcSelect.value = currentVal;
+    }
+  }
+
+  function renderMaintenance() {
+    if (!maintenanceList) return;
+    const filtered = allMaintenanceRecords.filter((rec) => {
+      if (activeMaintenanceFilter === 'all') return true;
+      return rec.status === activeMaintenanceFilter;
+    });
+
+    if (!filtered.length) {
+      maintenanceList.innerHTML = '<p class="admin-lab-muted">No maintenance records found for this filter.</p>';
+      return;
+    }
+
+    maintenanceList.innerHTML = filtered.map((rec) => {
+      const isCancellable = rec.status === 'scheduled' || rec.status === 'active';
+      return `<article class="admin-maintenance-card" data-maintenance-id="${escapeHtml(rec.id)}">
+        <div class="admin-maintenance-info">
+          <strong>${escapeHtml(rec.resourceName)} ${rec.subResourceName ? `· ${escapeHtml(rec.subResourceName)}` : ''}</strong>
+          <small>${escapeHtml(rec.date)} · ${escapeHtml(rec.startTime)}–${escapeHtml(rec.endTime)}</small>
+          <p><strong>Reason:</strong> ${escapeHtml(rec.reason)}${rec.description ? ` — ${escapeHtml(rec.description)}` : ''}</p>
+        </div>
+        <div class="admin-maintenance-actions">
+          <span class="status-badge status-${escapeHtml(rec.status)}">${escapeHtml(rec.status)}</span>
+          ${isCancellable ? `<button type="button" class="admin-small-button admin-danger-button" data-cancel-maintenance="${escapeHtml(rec.id)}">Cancel</button>` : ''}
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  if (maintenanceType) {
+    maintenanceType.addEventListener('change', () => {
+      const isLab = maintenanceType.value === 'lab';
+      if (maintenanceLabGroup) maintenanceLabGroup.style.display = isLab ? '' : 'none';
+      if (maintenancePcGroup) maintenancePcGroup.style.display = isLab ? '' : 'none';
+      if (maintenanceClassroomGroup) maintenanceClassroomGroup.style.display = isLab ? 'none' : '';
+    });
+  }
+
+  if (maintenanceLabSelect) {
+    maintenanceLabSelect.addEventListener('change', updatePcDropdown);
+  }
+
+  if (maintenanceForm) {
+    maintenanceForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submit = maintenanceForm.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      const values = Object.fromEntries(new FormData(maintenanceForm));
+      try {
+        await requestJson('/api/admin/maintenance', {
+          method: 'POST',
+          body: JSON.stringify(values),
+        });
+        showMessage('Maintenance scheduled successfully.', true);
+        maintenanceForm.reset();
+        if (maintenanceDateInput) maintenanceDateInput.value = localDate;
+        if (maintenanceType) maintenanceType.dispatchEvent(new Event('change'));
+        await loadManagement();
+      } catch (error) {
+        showMessage(error.message || 'Could not schedule maintenance.');
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-maintenance-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-maintenance-filter]').forEach((b) => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      activeMaintenanceFilter = btn.dataset.maintenanceFilter;
+      renderMaintenance();
+    });
+  });
+
+  if (maintenanceList) {
+    maintenanceList.addEventListener('click', async (event) => {
+      const cancelBtn = event.target.closest('[data-cancel-maintenance]');
+      if (!cancelBtn) return;
+      cancelBtn.disabled = true;
+      try {
+        await requestJson(`/api/admin/maintenance/${encodeURIComponent(cancelBtn.dataset.cancelMaintenance)}/cancel`, {
+          method: 'POST',
+        });
+        showMessage('Maintenance record cancelled.', true);
+        await loadManagement();
+      } catch (error) {
+        showMessage(error.message || 'Could not cancel maintenance.');
+        cancelBtn.disabled = false;
+      }
+    });
   }
 
   createForm.addEventListener('submit', async (event) => {

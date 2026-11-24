@@ -58,8 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<div class="computer-list">${computers.length ? computers.map((computer) => {
           const availability = hasAvailability ? computer.availability : 'unknown';
           const available = availability === 'available';
-          const stateLabel = availability === 'occupied' ? 'Occupied' : available ? 'Available' : 'Check a time';
-          const stateClass = availability === 'occupied' ? 'state--occupied' : available ? '' : 'state--neutral';
+          const inMaintenance = availability === 'maintenance';
+          const stateLabel = inMaintenance ? 'Maintenance' : availability === 'occupied' ? 'Occupied' : available ? 'Available' : 'Check a time';
+          const stateClass = inMaintenance ? 'state--occupied' : availability === 'occupied' ? 'state--occupied' : available ? '' : 'state--neutral';
           return `<div class="computer-row">
             <div><strong>${escapeHtml(computer.name || 'Computer')}</strong><small>${escapeHtml(computer.id || '')}</small></div>
             <span class="state ${stateClass}">${stateLabel}</span>

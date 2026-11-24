@@ -1,7 +1,7 @@
 // backend/init.js
 
 import db from './db.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import path from 'path';
 import { promises as fs } from 'fs';
 

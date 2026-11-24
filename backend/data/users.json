@@ -2,9 +2,10 @@
   {
     "id": "33708c9f-0cbe-4c64-89c5-67989f773b74",
     "email": "admin@campusspace.local",
-    "passwordHash": "$2b$12$/FEYjaixe/STTGvbMBl6Se7cm/AX/IFaDUvpV81Wrbwa//Mw/cGE.",
+    "passwordHash": "$2b$12$hKAOifFmiYLtgPtd0982DumE/aCciB10cKTa7erXq1HcHDAu5kO76",
     "role": "admin",
-    "createdAt": "2026-11-16T12:33:42.699Z"
+    "createdAt": "2026-11-16T12:33:42.699Z",
+    "active": true
   },
   {
     "id": "302ac734-cecf-4ce0-8596-4e88114a6a0d",
@@ -14,5 +15,14 @@
     "active": true,
     "createdAt": "2026-11-17T04:37:32.125Z",
     "studentId": "6fa966ef-9dd9-4f8b-8780-2fb1d43a3197"
+  },
+  {
+    "id": "7f922328-ef40-41cf-9111-26300c8115fe",
+    "email": "admin1@campusspace.local",
+    "passwordHash": "$2b$12$PbT5o9g8B2HBNzdMO6lKbOKUYbaIUyKVgpuudbcvxNEr09gGc4cuK",
+    "role": "teacher",
+    "teacherId": "07bfde24-72d5-4531-a0c5-8a254e778743",
+    "active": true,
+    "createdAt": "2026-11-20T15:39:47.244Z"
   }
 ]
